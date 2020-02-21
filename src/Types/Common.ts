@@ -1,3 +1,9 @@
+export interface IAnalizeChartData {
+  name: string;
+  Норма: number;
+  Патологія: number;
+}
+
 export interface IImage {
   Date: string;
   ImageID: number;
@@ -8,6 +14,7 @@ export interface IImage {
 }
 
 export interface IPatient {
+  Age: number;
   Diagnosis: string;
   DoctorID: number;
   FathersName: string;
@@ -15,7 +22,6 @@ export interface IPatient {
   Height: number;
   LastName: string;
   PatientID: number;
-  Phone: string;
   Weight: number;
 }
 

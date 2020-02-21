@@ -7,7 +7,7 @@ import { useRootData } from '../../hooks/useRootData';
 
 import { ISaveModalProps } from './Types';
 
-import { BASE_URL, IMAGE } from '../../constants/API';
+import { BASE_URL, IMAGE, STATIC } from '../../constants/API';
 import { FORM_ERRORS } from '../../constants/FormErrors';
 import { SENSORS } from '../../constants/Sensors';
 
@@ -54,7 +54,17 @@ const validate = values => {
   return errors;
 };
 
-const SaveModal: React.FC<ISaveModalProps> = ({ id, link, title, visible, onCancel, openModal }): JSX.Element => {
+const SaveModal: React.FC<ISaveModalProps> = ({
+  id,
+  link,
+  title,
+  visible,
+  onCancel,
+  openModal,
+  setLink,
+  setSrc,
+  setType,
+}): JSX.Element => {
   const { images, setImages } = useRootData(({ images, setImages }) => ({
     images: images.get(),
     setImages,
@@ -75,9 +85,7 @@ const SaveModal: React.FC<ISaveModalProps> = ({ id, link, title, visible, onCanc
         PatientID: id,
         Name: `${values.name}.jpg`,
         Type: values.sensorType,
-        Link: link.includes('data:image/png;base64,')
-          ? link.replace('data:image/jpeg;base64,', '')
-          : link.replace('data:image/jpeg;base64,', ''),
+        Link: link.substr(link.indexOf(',') + 1),
       };
 
       fetch(`${BASE_URL}${IMAGE}`, {
@@ -90,7 +98,16 @@ const SaveModal: React.FC<ISaveModalProps> = ({ id, link, title, visible, onCanc
         body: JSON.stringify(data),
       })
         .then(res => res.json())
-        .then(result => setImages([result, ...images]))
+        .then(result => {
+          setLink(result.Link);
+          setSrc(`${BASE_URL}${STATIC}${result.Name}`);
+          setType(result.Type);
+          if (images) {
+            setImages([...images, result]);
+          } else {
+            setImages([result]);
+          }
+        })
         .catch(err => console.error(err));
     },
   });

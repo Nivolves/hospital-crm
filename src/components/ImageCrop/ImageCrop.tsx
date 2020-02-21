@@ -11,7 +11,18 @@ import { UploadFile } from 'antd/lib/upload/interface';
 
 import 'react-image-crop/dist/ReactCrop.css';
 
-const ImageCrop: React.FC<IImageCropProps> = ({ id, setSrc, src }): JSX.Element => {
+const ImageCrop: React.FC<IImageCropProps> = ({
+  data,
+  id,
+  link,
+  setData,
+  setLink,
+  setSrc,
+  setType,
+  setTypeResult,
+  src,
+  type,
+}): JSX.Element => {
   const [crop, setCrop] = useState<Crop>({ aspect: 16 / 9 });
   const [croppedImage, setCropedImage] = useState<unknown>(undefined);
   const [image, setImage] = useState<any>(null);
@@ -52,13 +63,8 @@ const ImageCrop: React.FC<IImageCropProps> = ({ id, setSrc, src }): JSX.Element 
   };
 
   const handleComplete = useCallback(async () => {
-    const img = new Image();
-
-    img.setAttribute('crossorigin', 'anonymous');
-    img.src = src as string;
-    // console.log(img);
-    setCropedImage(await getCroppedImg(img, crop));
-  }, [crop, src]);
+    setCropedImage(await getCroppedImg(image, crop));
+  }, [crop, image]);
 
   const handleChange = useCallback(info => {
     if (info.file.status === 'done') {
@@ -97,6 +103,9 @@ const ImageCrop: React.FC<IImageCropProps> = ({ id, setSrc, src }): JSX.Element 
         onCancel={handleCancel}
         openModal={openModal}
         visible={isModalOpen}
+        setLink={setLink}
+        setSrc={setSrc}
+        setType={setType}
       />
       <Upload
         fileList={fileList}
@@ -109,7 +118,7 @@ const ImageCrop: React.FC<IImageCropProps> = ({ id, setSrc, src }): JSX.Element 
         beforeUpload={handleUpload}
         name="file"
       >
-        <Button>
+        <Button style={{ marginBottom: 30 }}>
           <Icon type="upload" />
           Завантажити
         </Button>
@@ -118,6 +127,7 @@ const ImageCrop: React.FC<IImageCropProps> = ({ id, setSrc, src }): JSX.Element 
         <div style={{ display: 'flex' }}>
           <div style={{ width: '50%' }}>
             <ReactCrop
+              crossorigin="anonymous"
               style={{ display: 'block' }}
               onImageLoaded={image => setImage(image)}
               src={src as string}
@@ -125,7 +135,7 @@ const ImageCrop: React.FC<IImageCropProps> = ({ id, setSrc, src }): JSX.Element 
               onComplete={handleComplete}
               onChange={newCrop => setCrop(newCrop)}
             />
-            <AnalizeForm />
+            <AnalizeForm data={data} link={link} setData={setData} setTypeResult={setTypeResult} type={type} />
           </div>
           <div style={{ width: '50%' }}>
             {croppedImage && (
@@ -141,6 +151,9 @@ const ImageCrop: React.FC<IImageCropProps> = ({ id, setSrc, src }): JSX.Element 
                   onCancel={() => openCropModal(false)}
                   openModal={openCropModal}
                   visible={isCropModalOpen}
+                  setLink={setLink}
+                  setSrc={setSrc}
+                  setType={setType}
                 />
               </div>
             )}

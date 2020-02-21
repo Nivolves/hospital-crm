@@ -39,6 +39,7 @@ const tailFormItemLayout = {
 };
 
 const validationSchema = Yup.object({
+  age: Yup.number().required(requiredError),
   fathersName: Yup.string()
     .min(2, minError)
     .max(32, maxError)
@@ -65,6 +66,7 @@ const PatientForm: React.FC<IPatientFormProps> = ({ id }): JSX.Element => {
 
   const { errors, handleSubmit, handleChange, setFieldValue, values } = useFormik({
     initialValues: {
+      age: 0,
       fathersName: '',
       firstName: '',
       height: 50,
@@ -73,16 +75,16 @@ const PatientForm: React.FC<IPatientFormProps> = ({ id }): JSX.Element => {
     },
     validateOnChange: false,
     validationSchema,
-    onSubmit(values) {
+    onSubmit({ age, fathersName, firstName, height, lastName, weight }) {
       const data = {
+        Age: age,
         DoctorID: 2,
-        Height: values.height,
-        Weight: values.weight,
-        FirstName: values.firstName,
-        LastName: values.lastName,
-        FathersName: values.fathersName,
+        Height: height,
+        Weight: weight,
+        FirstName: firstName,
+        LastName: lastName,
+        FathersName: fathersName,
         Diagnosis: '',
-        Phone: '380503216708',
       };
       if (id) {
         console.log(id);
@@ -98,7 +100,11 @@ const PatientForm: React.FC<IPatientFormProps> = ({ id }): JSX.Element => {
         })
           .then(res => res.json())
           .then(result => {
-            setPatients([result, ...patients]);
+            if (patients) {
+              setPatients([result, ...patients]);
+            } else {
+              setPatients([result]);
+            }
             history.push(`/doctor/patient/${result.PatientID}`);
           })
           .catch(err => console.error(err));
@@ -107,8 +113,9 @@ const PatientForm: React.FC<IPatientFormProps> = ({ id }): JSX.Element => {
   });
 
   useEffect(() => {
-    const patient = patients.find(({ PatientID }) => PatientID === id);
     if (id) {
+      const patient = patients.find(({ PatientID }) => PatientID === id);
+      setFieldValue('age', patient?.Age);
       setFieldValue('fathersName', patient?.FathersName);
       setFieldValue('firstName', patient?.FirstName);
       setFieldValue('height', patient?.Height);
@@ -117,7 +124,7 @@ const PatientForm: React.FC<IPatientFormProps> = ({ id }): JSX.Element => {
     }
   }, [id, patients, setFieldValue]);
 
-  const { fathersName, firstName, height, lastName, weight } = values;
+  const { age, fathersName, firstName, height, lastName, weight } = values;
 
   return (
     <Form {...formItemLayout} onSubmit={handleSubmit}>
@@ -141,6 +148,17 @@ const PatientForm: React.FC<IPatientFormProps> = ({ id }): JSX.Element => {
         help={errors.fathersName ? errors.fathersName : ''}
       >
         <Input placeholder="По батькові" onChange={handleChange} id="fathersName" value={fathersName} />
+      </Form.Item>
+      <Form.Item label="Вік" validateStatus={errors.age ? 'error' : ''} help={errors.age ? errors.age : ''}>
+        <InputNumber
+          min={0}
+          value={age}
+          defaultValue={0}
+          onChange={value => {
+            setFieldValue('age', value);
+          }}
+          id="age"
+        />
       </Form.Item>
       <Form.Item label="Вага" validateStatus={errors.weight ? 'error' : ''} help={errors.weight ? errors.weight : ''}>
         <InputNumber

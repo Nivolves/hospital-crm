@@ -5,4 +5,7 @@ export interface ISaveModalProps {
   visible: boolean;
   onCancel?: ((e: React.MouseEvent<HTMLElement, MouseEvent>) => void) | undefined;
   openModal: React.Dispatch<React.SetStateAction<boolean>>;
+  setLink: React.Dispatch<React.SetStateAction<string>>;
+  setSrc: React.Dispatch<React.SetStateAction<string | ArrayBuffer | null>>;
+  setType: React.Dispatch<React.SetStateAction<string>>;
 }
