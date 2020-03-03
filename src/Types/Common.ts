@@ -1,3 +1,11 @@
+export interface IAnalize {
+  AnalizeID: number;
+  Date: string;
+  Name: string;
+  Value: string;
+  PatientID: number;
+}
+
 export interface IAnalizeChartData {
   name: string;
   Норма: number;

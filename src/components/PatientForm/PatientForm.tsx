@@ -78,7 +78,7 @@ const PatientForm: React.FC<IPatientFormProps> = ({ id }): JSX.Element => {
     onSubmit({ age, fathersName, firstName, height, lastName, weight }) {
       const data = {
         Age: age,
-        DoctorID: 2,
+        DoctorID: 1,
         Height: height,
         Weight: weight,
         FirstName: firstName,
@@ -87,7 +87,27 @@ const PatientForm: React.FC<IPatientFormProps> = ({ id }): JSX.Element => {
         Diagnosis: '',
       };
       if (id) {
-        console.log(id);
+        fetch(`${BASE_URL}${PATIENT}/${id}`, {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: JSON.stringify(data),
+        })
+          .then(res => res.json())
+          .then(result => {
+            const updatedPatients = patients.map(patient => {
+              const { PatientID } = patient;
+              if (PatientID === result.PatientID) {
+                return result;
+              }
+              return patient;
+            });
+            setPatients(updatedPatients);
+          })
+          .catch(err => console.error(err));
       } else {
         fetch(`${BASE_URL}${PATIENT}`, {
           method: 'POST',
@@ -114,7 +134,7 @@ const PatientForm: React.FC<IPatientFormProps> = ({ id }): JSX.Element => {
 
   useEffect(() => {
     if (id) {
-      const patient = patients.find(({ PatientID }) => PatientID === id);
+      const patient = patients?.find(({ PatientID }) => PatientID === id);
       setFieldValue('age', patient?.Age);
       setFieldValue('fathersName', patient?.FathersName);
       setFieldValue('firstName', patient?.FirstName);

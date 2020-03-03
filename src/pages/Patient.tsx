@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 
 import AnalizeChart from '../components/AnalizeChart/AnalizeChart';
+import Analizes from '../components/Analizes/Analizes';
 import ImageCrop from '../components/ImageCrop/ImageCrop';
 import ImageSelect from '../components/ImageSelect/ImageSelect';
 import PatientForm from '../components/PatientForm/PatientForm';
@@ -19,11 +20,12 @@ const Patient: React.FC<RouteComponentProps<url>> = ({
   const [link, setLink] = useState<string>('');
   const [src, setSrc] = useState<string | ArrayBuffer | null>('');
   const [type, setType] = useState<string>('');
-  const [typeResult, setTypeResult] = useState<string[]>();
+  const [typeResult, setTypeResult] = useState<string>();
 
   return (
     <>
       <PatientForm id={+path} />
+      <Analizes id={+path} />
       <ImageCrop
         data={data}
         id={+path}

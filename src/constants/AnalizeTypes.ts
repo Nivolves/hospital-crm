@@ -1,1 +1,1 @@
-export const ANALIZE_TYPES = [{ name: 'Хворий/Не хворий', type: 'isNormal' }];
+export const ANALIZE_TYPES = [{ name: 'Норма/Патологія', type: 'isNormal' }];

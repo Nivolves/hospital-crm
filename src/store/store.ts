@@ -1,11 +1,16 @@
 import { observable } from 'mobx';
 
-import { IImage, IPatient } from '../Types/Common';
+import { IAnalize, IImage, IPatient } from '../Types/Common';
 
 export const createStore = () => {
   const store = {
+    analizes: observable.box<IAnalize[]>([]),
     images: observable.box<IImage[]>([]),
     patients: observable.box<IPatient[]>([]),
+
+    setAnalizes(analizes: IAnalize[]): void {
+      this.analizes.set(analizes);
+    },
 
     setPatients(patients: IPatient[]): void {
       this.patients.set(patients);

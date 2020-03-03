@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { Button, Form, Select, Spin } from 'antd';
 import * as Yup from 'yup';
 import { useFormik } from 'formik';
 
+import { Button, Form, Select, Spin } from 'antd';
+
 import { IAnalizeFormProps } from './Types';
 
-import { ANALIZE, BASE_URL } from '../../constants/API';
+import { CALCULATE, BASE_URL } from '../../constants/API';
 import { ANALIZE_TYPES } from '../../constants/AnalizeTypes';
 import { FORM_ERRORS } from '../../constants/FormErrors';
 
@@ -61,7 +62,7 @@ const AnalizeForm: React.FC<IAnalizeFormProps> = ({
         task: values.analizeType,
         sensor: type,
       };
-      fetch(`${BASE_URL}${ANALIZE}`, {
+      fetch(`${BASE_URL}${CALCULATE}`, {
         method: 'POST',
         credentials: 'same-origin',
         headers: {
@@ -76,7 +77,7 @@ const AnalizeForm: React.FC<IAnalizeFormProps> = ({
           const res = JSON.parse(result);
           setTypeResult(res.type_result);
 
-          const data = res.mean_signs[0].reduce((acc, item) => {
+          const data = res.mean_signs.reduce((acc, item) => {
             const column = {
               name: item[0],
               Норма: item[1],
