@@ -83,7 +83,7 @@ const SaveModal: React.FC<ISaveModalProps> = ({
       openModal(false);
       const data = {
         PatientID: id,
-        Name: `${values.name}.jpg`,
+        Name: `${values.name}.png`,
         Type: values.sensorType,
         Link: link.substr(link.indexOf(',') + 1),
       };

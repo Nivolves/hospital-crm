@@ -57,7 +57,8 @@ const ImageCrop: React.FC<IImageCropProps> = ({
     }
 
     return new Promise(resolve => {
-      const url = canvas.toDataURL('image/jpeg', 1.0);
+      const url = canvas.toDataURL('image/png', 1.0);
+      console.log(url);
       resolve(url);
     });
   };
