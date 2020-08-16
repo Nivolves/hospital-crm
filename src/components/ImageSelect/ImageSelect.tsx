@@ -15,8 +15,10 @@ const ImageSelect: React.FC<IImageSelectProps> = ({ id, setData, setLink, setSrc
 
   const patientImages = images?.length ? images.filter(({ PatientID }) => PatientID === id).reverse() : [];
 
-  const handleImageSelecat = useCallback(
+
+  const handleImageSelect = useCallback(
     (Link, Name, Type) => {
+      console.log(Link);
       setData([]);
       setLink(Link);
       setSrc(`${BASE_URL}${STATIC}${Name}`);
@@ -28,13 +30,15 @@ const ImageSelect: React.FC<IImageSelectProps> = ({ id, setData, setLink, setSrc
   return (
     <div className="images-container">
       {!!patientImages.length &&
-        patientImages.map(({ ImageID, Link, Name, Type }) => (
-          <div key={ImageID} className="image">
-            <img onClick={() => handleImageSelecat(Link, Name, Type)} src={`${BASE_URL}${STATIC}${Name}`} alt="crop" />
-            <br />
-            {Name}
-          </div>
-        ))}
+        patientImages.map(({ ImageID, Name }, index) => {
+          return(
+            <div key={ImageID} className="image">
+              <img onClick={() => handleImageSelect(patientImages[index - 1].Link, Name, patientImages[index - 1].Type)} src={`${BASE_URL}${STATIC}${Name}`} alt="crop" />
+              <br />
+              {Name}
+            </div>
+          );
+        })}
     </div>
   );
 };

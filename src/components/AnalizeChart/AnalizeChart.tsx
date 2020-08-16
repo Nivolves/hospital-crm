@@ -6,7 +6,7 @@ import { IAnalizeChartProps } from './Types';
 
 const AnalizeChart: React.FC<IAnalizeChartProps> = ({ data, typeResult }): JSX.Element => {
   return (
-    <>
+    <div>
       <BarChart style={{ marginTop: 30 }} width={730} height={250} data={data}>
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="name" />
@@ -16,8 +16,10 @@ const AnalizeChart: React.FC<IAnalizeChartProps> = ({ data, typeResult }): JSX.E
         <Bar dataKey="Норма" fill="#82ca9d" />
         <Bar dataKey="Патологія" fill="#ff0000" />
       </BarChart>
-      {typeResult}
-    </>
+      {Object.keys(typeResult).map((key) => (
+        <p key={key}>{key}: {typeResult[key]}</p>
+      ))}
+    </div>
   );
 };
 

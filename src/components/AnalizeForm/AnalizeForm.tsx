@@ -10,6 +10,8 @@ import { CALCULATE, BASE_URL } from '../../constants/API';
 import { ANALIZE_TYPES } from '../../constants/AnalizeTypes';
 import { FORM_ERRORS } from '../../constants/FormErrors';
 
+import { getTransformImages } from '../../utils/getTransformImages';
+
 const { requiredError } = FORM_ERRORS;
 const { Option } = Select;
 
@@ -56,11 +58,15 @@ const AnalizeForm: React.FC<IAnalizeFormProps> = ({
     validateOnChange: false,
     validationSchema,
     onSubmit(values, { resetForm }) {
+      console.log(values);
       setLoading(true);
+      const [transformLink, binaryLink] = getTransformImages(link);
       const data = {
-        Link: link,
-        task: values.analizeType,
-        sensor: type,
+        'Link': link,
+        'Task': '1',
+        'Sensor': type,
+        'SaveTransform': transformLink,
+        'SaveBinarization': binaryLink
       };
       fetch(`${BASE_URL}${CALCULATE}`, {
         method: 'POST',
@@ -75,13 +81,13 @@ const AnalizeForm: React.FC<IAnalizeFormProps> = ({
         .then(result => {
           setLoading(false);
           const res = JSON.parse(result);
-          setTypeResult(res.type_result);
+          setTypeResult({'Результат модели МГУА': res.gmdh_result, 'Результат леса классификации': res.forest_result});
 
           const data = res.mean_signs.reduce((acc, item) => {
             const column = {
-              name: item[0],
-              Норма: item[1],
-              Патологія: item[2],
+              name: `${item['feature']} (${item['result']}`,
+              Норма: item['value'],
+              Патологія: item['threshold'],
             };
             acc.push(column);
             return acc;

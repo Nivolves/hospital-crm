@@ -10,6 +10,7 @@ import { IImageCropProps } from './Types';
 import { UploadFile } from 'antd/lib/upload/interface';
 
 import 'react-image-crop/dist/ReactCrop.css';
+// import './ImageCrop.scss';
 
 const ImageCrop: React.FC<IImageCropProps> = ({
   data,
@@ -23,7 +24,7 @@ const ImageCrop: React.FC<IImageCropProps> = ({
   src,
   type,
 }): JSX.Element => {
-  const [crop, setCrop] = useState<Crop>({ aspect: 16 / 9 });
+  const [crop, setCrop] = useState<Crop>({});
   const [croppedImage, setCropedImage] = useState<unknown>(undefined);
   const [image, setImage] = useState<any>(null);
   const [isModalOpen, openModal] = useState<boolean>(false);
@@ -58,7 +59,6 @@ const ImageCrop: React.FC<IImageCropProps> = ({
 
     return new Promise(resolve => {
       const url = canvas.toDataURL('image/png', 1.0);
-      console.log(url);
       resolve(url);
     });
   };
@@ -95,6 +95,8 @@ const ImageCrop: React.FC<IImageCropProps> = ({
     setFileList([]);
   }, [openModal, setFileList, setSrc]);
 
+  console.log(src, type);
+
   return (
     <>
       <SaveModal
@@ -126,7 +128,7 @@ const ImageCrop: React.FC<IImageCropProps> = ({
       </Upload>
       {src && (
         <div style={{ display: 'flex' }}>
-          <div style={{ width: '50%' }}>
+          <div style={{ width: '80%' }}>
             <ReactCrop
               crossorigin="anonymous"
               style={{ display: 'block' }}
@@ -138,7 +140,7 @@ const ImageCrop: React.FC<IImageCropProps> = ({
             />
             <AnalizeForm data={data} link={link} setData={setData} setTypeResult={setTypeResult} type={type} />
           </div>
-          <div style={{ width: '50%' }}>
+          <div style={{ width: '20%' }}>
             {croppedImage && (
               <div style={{ marginLeft: 50 }}>
                 <img style={{ display: 'block' }} src={croppedImage as string} alt="crop" />
@@ -155,6 +157,7 @@ const ImageCrop: React.FC<IImageCropProps> = ({
                   setLink={setLink}
                   setSrc={setSrc}
                   setType={setType}
+                  type={type}
                 />
               </div>
             )}

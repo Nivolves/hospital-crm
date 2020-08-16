@@ -2,13 +2,15 @@ import React, { useEffect, useState } from 'react';
 
 import AddAnalize from './AddAnalize';
 
-import { Button } from 'antd';
+import { Button, Collapse, List } from 'antd';
 
 import { useRootData } from '../../hooks/useRootData';
 
 import { IAnalizesProps } from './Types';
 
 import { ANALIZES, BASE_URL } from '../../constants/API';
+
+const { Panel } = Collapse;
 
 const Analizes: React.FC<IAnalizesProps> = ({ id }): JSX.Element => {
   const [isModalOpen, setModal] = useState<boolean>(false);
@@ -34,12 +36,21 @@ const Analizes: React.FC<IAnalizesProps> = ({ id }): JSX.Element => {
       </Button>
       <AddAnalize id={id} isModalOpen={isModalOpen} setModal={setModal} />
       <>
-        {analizes &&
-          analizes.map(({ Date: date, Name, Value }) => (
-            <p key={date}>
-              {new Date(date).toLocaleDateString()} &nbsp;{Name} &nbsp;{Value}
-            </p>
-          ))}
+        {analizes && (
+          <Collapse style={{ maxWidth: 400, marginBottom: 30 }}>
+            <Panel header="Аналізи" key="1">
+              <List
+                itemLayout="horizontal"
+                dataSource={analizes}
+                renderItem={({ Date: date, Name, Value }) => (
+                  <List.Item>
+                    <List.Item.Meta title={new Date(date).toLocaleDateString()} description={`${Name}  ${Value}`} />
+                  </List.Item>
+                )}
+              ></List>
+            </Panel>
+          </Collapse>
+        )}
       </>
     </div>
   );

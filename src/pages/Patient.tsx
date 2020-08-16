@@ -6,6 +6,7 @@ import Analizes from '../components/Analizes/Analizes';
 import ImageCrop from '../components/ImageCrop/ImageCrop';
 import ImageSelect from '../components/ImageSelect/ImageSelect';
 import PatientForm from '../components/PatientForm/PatientForm';
+import TransformImages from '../components/TransformImages/TransformImages';
 
 import { IAnalizeChartData } from '../Types/Common';
 
@@ -20,7 +21,7 @@ const Patient: React.FC<RouteComponentProps<url>> = ({
   const [link, setLink] = useState<string>('');
   const [src, setSrc] = useState<string | ArrayBuffer | null>('');
   const [type, setType] = useState<string>('');
-  const [typeResult, setTypeResult] = useState<string>();
+  const [typeResult, setTypeResult] = useState<{[key: string]: string}>();
 
   return (
     <>
@@ -38,8 +39,11 @@ const Patient: React.FC<RouteComponentProps<url>> = ({
         src={src}
         type={type}
       />
-      {data && !!data.length && typeResult && !!typeResult.length && (
-        <AnalizeChart data={data} typeResult={typeResult} />
+      {data && !!data.length && typeResult && !!Object.values(typeResult).length && (
+        <div style={{display: 'flex', justifyContent: 'space-around'}}>
+          <AnalizeChart data={data} typeResult={typeResult} />
+          <TransformImages link={src as string}/>
+        </div>
       )}
       <ImageSelect id={+path} setData={setData} setLink={setLink} setSrc={setSrc} setType={setType} />
     </>

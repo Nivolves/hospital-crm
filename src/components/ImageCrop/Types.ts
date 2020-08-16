@@ -8,7 +8,7 @@ export interface IImageCropProps {
   setLink: React.Dispatch<React.SetStateAction<string>>;
   setSrc: React.Dispatch<React.SetStateAction<string | ArrayBuffer | null>>;
   setType: React.Dispatch<React.SetStateAction<string>>;
-  setTypeResult: React.Dispatch<React.SetStateAction<string | undefined>>;
+  setTypeResult: React.Dispatch<React.SetStateAction<{[key: string]: string} | undefined>>;
   src: string | ArrayBuffer | null;
   type: string;
 }

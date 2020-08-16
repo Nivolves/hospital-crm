@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Button, Form, Input, Modal, Select } from 'antd';
 import * as Yup from 'yup';
 import { useFormik } from 'formik';
@@ -64,6 +64,7 @@ const SaveModal: React.FC<ISaveModalProps> = ({
   setLink,
   setSrc,
   setType,
+  type,
 }): JSX.Element => {
   const { images, setImages } = useRootData(({ images, setImages }) => ({
     images: images.get(),
@@ -111,6 +112,12 @@ const SaveModal: React.FC<ISaveModalProps> = ({
         .catch(err => console.error(err));
     },
   });
+
+  useEffect(() => {
+    if (type) {
+      setFieldValue('sensorType', type);
+    }
+  }, [setFieldValue, type]);
 
   const { name, sensorType } = values;
   return (
