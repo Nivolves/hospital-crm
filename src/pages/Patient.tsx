@@ -21,7 +21,7 @@ const Patient: React.FC<RouteComponentProps<url>> = ({
   const [link, setLink] = useState<string>('');
   const [src, setSrc] = useState<string | ArrayBuffer | null>('');
   const [type, setType] = useState<string>('');
-  const [typeResult, setTypeResult] = useState<{[key: string]: string}>();
+  const [typeResult, setTypeResult] = useState<{ [key: string]: string }>();
 
   return (
     <>
@@ -40,9 +40,9 @@ const Patient: React.FC<RouteComponentProps<url>> = ({
         type={type}
       />
       {data && !!data.length && typeResult && !!Object.values(typeResult).length && (
-        <div style={{display: 'flex', justifyContent: 'space-around'}}>
+        <div style={{ display: 'flex', justifyContent: 'space-around' }}>
           <AnalizeChart data={data} typeResult={typeResult} />
-          <TransformImages link={src as string}/>
+          <TransformImages link={src as string} />
         </div>
       )}
       <ImageSelect id={+path} setData={setData} setLink={setLink} setSrc={setSrc} setType={setType} />

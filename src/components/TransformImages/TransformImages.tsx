@@ -4,19 +4,19 @@ import { ITransformImagesProps } from './Types';
 
 import { getTransformImages } from '../../utils/getTransformImages';
 
-const TransformImages: React.FC<ITransformImagesProps> = ({link}): JSX.Element => {
+const TransformImages: React.FC<ITransformImagesProps> = ({ link }): JSX.Element => {
   const images = getTransformImages(link);
 
   return (
-    <div style={{display: 'flex', flexWrap: 'wrap'}}>
+    <div style={{ display: 'flex', flexWrap: 'wrap' }}>
       {!!images.length && (
         <>
-          <div style={{width: 150}}>
-            <img style={{display: 'block', width: '100%'}} src={images[0]} alt="transform"/>
+          <div style={{ width: 150 }}>
+            <img style={{ display: 'block', width: '100%' }} src={images[0]} alt="transform" />
             Трансформоване зображення
           </div>
-          <div style={{width: 150, marginLeft: 10}}>
-            <img style={{display: 'block', width: '100%'}} src={images[1]} alt="binary"/>
+          <div style={{ width: 150, marginLeft: 10 }}>
+            <img style={{ display: 'block', width: '100%' }} src={images[1]} alt="binary" />
             Бiнарiзоване зображення
           </div>
         </>

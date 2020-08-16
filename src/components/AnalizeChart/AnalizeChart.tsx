@@ -16,8 +16,10 @@ const AnalizeChart: React.FC<IAnalizeChartProps> = ({ data, typeResult }): JSX.E
         <Bar dataKey="Норма" fill="#82ca9d" />
         <Bar dataKey="Патологія" fill="#ff0000" />
       </BarChart>
-      {Object.keys(typeResult).map((key) => (
-        <p key={key}>{key}: {typeResult[key]}</p>
+      {Object.keys(typeResult).map(key => (
+        <p key={key}>
+          {key}: {typeResult[key]}
+        </p>
       ))}
     </div>
   );

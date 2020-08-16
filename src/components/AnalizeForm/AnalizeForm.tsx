@@ -62,11 +62,11 @@ const AnalizeForm: React.FC<IAnalizeFormProps> = ({
       setLoading(true);
       const [transformLink, binaryLink] = getTransformImages(link);
       const data = {
-        'Link': link,
-        'Task': '1',
-        'Sensor': type,
-        'SaveTransform': transformLink,
-        'SaveBinarization': binaryLink
+        Link: link,
+        Task: '1',
+        Sensor: type,
+        SaveTransform: transformLink,
+        SaveBinarization: binaryLink,
       };
       fetch(`${BASE_URL}${CALCULATE}`, {
         method: 'POST',
@@ -81,7 +81,10 @@ const AnalizeForm: React.FC<IAnalizeFormProps> = ({
         .then(result => {
           setLoading(false);
           const res = JSON.parse(result);
-          setTypeResult({'Результат модели МГУА': res.gmdh_result, 'Результат леса классификации': res.forest_result});
+          setTypeResult({
+            'Результат модели МГУА': res.gmdh_result,
+            'Результат леса классификации': res.forest_result,
+          });
 
           const data = res.mean_signs.reduce((acc, item) => {
             const column = {
