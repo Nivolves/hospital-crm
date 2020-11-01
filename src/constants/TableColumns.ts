@@ -1,6 +1,6 @@
 export const TABLE_COLUMNS = [
   {
-    title: 'Ім\'я',
+    title: "Ім'я",
     dataIndex: 'FirstName',
     key: 'FirstName',
   },

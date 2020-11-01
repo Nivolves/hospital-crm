@@ -14,27 +14,34 @@ const { Column } = Table;
 const PatientsTable: React.FC = (): JSX.Element => {
   const { patients, setPatients } = useRootData(({ patients, setPatients }) => ({
     patients: patients.get(),
-    setPatients
+    setPatients,
   }));
 
   const history = useHistory();
 
   const handleDeletePatient = useCallback(
-    (id) => {
+    id => {
       fetch(`${BASE_URL}${PATIENT}/delete/${id}`)
-        .then(() => setPatients(patients.filter(({PatientID}) => PatientID !== id)))
+        .then(() => setPatients(patients.filter(({ PatientID }) => PatientID !== id)))
         .catch(err => console.error(err));
     },
     [patients, setPatients],
   );
 
   return (
-    <Table
-      rowKey="PatientID"
-      dataSource={patients}
-    >
-      <Column onCellClick={(row: IPatient) => history.push(`/doctor/patient/${row.PatientID}`)} title="Ім'я" dataIndex="FirstName" key="FirstName" />
-      <Column onCellClick={(row: IPatient) => history.push(`/doctor/patient/${row.PatientID}`)} title="Прізвище" dataIndex="LastName" key="LastName" />
+    <Table rowKey="PatientID" dataSource={patients}>
+      <Column
+        onCellClick={(row: IPatient) => history.push(`/doctor/patient/${row.PatientID}`)}
+        title="Ім'я"
+        dataIndex="FirstName"
+        key="FirstName"
+      />
+      <Column
+        onCellClick={(row: IPatient) => history.push(`/doctor/patient/${row.PatientID}`)}
+        title="Прізвище"
+        dataIndex="LastName"
+        key="LastName"
+      />
       <Column
         onCellClick={(values: IPatient) => handleDeletePatient(values.PatientID)}
         title="Action"
@@ -42,7 +49,7 @@ const PatientsTable: React.FC = (): JSX.Element => {
         render={() => {
           return <a>Delete</a>;
         }}
-    />
+      />
     </Table>
   );
 };
