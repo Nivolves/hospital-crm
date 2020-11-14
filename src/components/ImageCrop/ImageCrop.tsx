@@ -95,8 +95,6 @@ const ImageCrop: React.FC<IImageCropProps> = ({
     setFileList([]);
   }, [openModal, setFileList, setSrc]);
 
-  console.log(src, type);
-
   return (
     <>
       <SaveModal

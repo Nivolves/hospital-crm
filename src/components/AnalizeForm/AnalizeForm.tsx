@@ -48,7 +48,6 @@ const AnalizeForm: React.FC<IAnalizeFormProps> = ({
   link,
   setData,
   setTypeResult,
-  type,
 }): JSX.Element => {
   const [isLoading, setLoading] = useState<boolean>(false);
   const { errors, handleSubmit, setFieldValue, values } = useFormik({
@@ -57,17 +56,23 @@ const AnalizeForm: React.FC<IAnalizeFormProps> = ({
     },
     validateOnChange: false,
     validationSchema,
-    onSubmit(values, { resetForm }) {
-      console.log(values);
+    onSubmit(_, { resetForm }) {
       setLoading(true);
       const [transformLink, binaryLink] = getTransformImages(link);
       const data = {
-        Link: link,
-        Task: '1',
-        Sensor: type,
-        SaveTransform: transformLink,
-        SaveBinarization: binaryLink,
+        'name': 'test.png',
+        'task': '1',
+        'sensor': 'convex',
+        'saveTransform': 'test-transform.png',
+        'saveBinarization': 'test-binary.png'
       };
+      // const data = {
+      //   name: 'test.png',
+      //   task: '1',
+      //   sensor: type,
+      //   saveTransform: transformLink,
+      //   saveBinarization: binaryLink,
+      // };
       fetch(`${BASE_URL}${CALCULATE}`, {
         method: 'POST',
         credentials: 'same-origin',

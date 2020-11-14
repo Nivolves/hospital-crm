@@ -1,4 +1,4 @@
-export const BASE_URL = 'http://hospitalapi.dncapp.website/';
+export const BASE_URL = '/';
 export const CALCULATE = 'calculate';
 export const ANALIZE = 'analize';
 export const ANALIZES = 'analizes';

@@ -2,7 +2,7 @@ import { IAnalizeChartData } from '../../Types/Common';
 
 export interface IImageCropProps {
   data: IAnalizeChartData[] | undefined;
-  id: number;
+  id: string;
   link: string;
   setData: React.Dispatch<React.SetStateAction<IAnalizeChartData[] | undefined>>;
   setLink: React.Dispatch<React.SetStateAction<string>>;

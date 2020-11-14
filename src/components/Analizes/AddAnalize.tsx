@@ -56,13 +56,13 @@ const AddAnalize: React.FC<IAddAnalizeProps> = ({ id, isModalOpen, setModal }): 
     validateOnChange: false,
     validationSchema,
     onSubmit(values, { resetForm }) {
-      const data = { ...values, PatientID: id };
+      const data = { ...values, patientId: id };
       fetch(`${BASE_URL}${ANALIZE}`, {
         method: 'POST',
         credentials: 'same-origin',
         headers: {
           Accept: 'application/json',
-          'Content-Type': 'application/x-www-form-urlencoded',
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify(data),
       })
@@ -71,7 +71,7 @@ const AddAnalize: React.FC<IAddAnalizeProps> = ({ id, isModalOpen, setModal }): 
           if (analizes) {
             setAnalizes([result, ...analizes]);
           } else {
-            setAnalizes([analizes]);
+            setAnalizes([result]);
           }
           setModal(false);
         })

@@ -1,5 +1,5 @@
 export interface ISaveModalProps {
-  id: number;
+  id: string;
   link: string;
   title: string;
   visible: boolean;

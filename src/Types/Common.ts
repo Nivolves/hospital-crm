@@ -1,9 +1,9 @@
 export interface IAnalize {
-  AnalizeID: number;
-  Date: string;
-  Name: string;
-  Value: string;
-  PatientID: number;
+  dnalizeId: number;
+  date: string;
+  name: string;
+  value: string;
+  patientID: number;
 }
 
 export interface IAnalizeChartData {
@@ -13,24 +13,24 @@ export interface IAnalizeChartData {
 }
 
 export interface IImage {
-  Date: string;
-  ImageID: number;
-  Link: string;
-  Name: string;
-  PatientID: number;
-  Type: string;
+  date: string;
+  imageId: number;
+  link: string;
+  name: string;
+  patientId: number;
+  type: string;
 }
 
 export interface IPatient {
-  Age: number;
-  Diagnosis: string;
-  DoctorID: number;
-  FathersName: string;
-  FirstName: string;
-  Height: number;
-  LastName: string;
-  PatientID: number;
-  Weight: number;
+  age: number;
+  diagnosis: string;
+  doctorId: string;
+  fathersName: string;
+  firstName: string;
+  height: number;
+  lastName: string;
+  patientId: string;
+  weight: number;
 }
 
 export type IAppProps = {

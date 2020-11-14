@@ -6,28 +6,27 @@ import { useRootData } from './hooks/useRootData';
 
 import { IAppProps } from './Types/Common';
 
-import { BASE_URL, IMAGES, PATIENTS } from './constants/API';
+import { BASE_URL, PATIENTS } from './constants/API';
 import { DOCKTOR_MENU } from './constants/Menus';
 
 const { SubMenu } = Menu;
 const { Content, Sider } = Layout;
 
 const App: React.FC<IAppProps> = ({ children }): JSX.Element => {
-  const { setImages, setPatients } = useRootData(({ setImages, setPatients }) => ({
-    setImages,
+  const { setPatients } = useRootData(({ setPatients }) => ({
     setPatients,
   }));
 
   useEffect(() => {
-    fetch(`${BASE_URL}${PATIENTS}`)
+    fetch(`${BASE_URL}${PATIENTS}`,{
+      headers: {
+        doctorId: '1'
+      }
+    })
       .then(res => res.json())
       .then(result => setPatients(result))
       .catch(err => console.error(err));
-    fetch(`${BASE_URL}${IMAGES}`)
-      .then(res => res.json())
-      .then(result => setImages(result))
-      .catch(err => console.error(err));
-  }, [setImages, setPatients]);
+  }, [setPatients]);
 
   return (
     <Content>

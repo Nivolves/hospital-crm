@@ -77,30 +77,31 @@ const PatientForm: React.FC<IPatientFormProps> = ({ id }): JSX.Element => {
     validationSchema,
     onSubmit({ age, fathersName, firstName, height, lastName, weight }) {
       const data = {
-        Age: age,
-        DoctorID: 1,
-        Height: height,
-        Weight: weight,
-        FirstName: firstName,
-        LastName: lastName,
-        FathersName: fathersName,
-        Diagnosis: '',
+        age,
+        doctorId: 1,
+        height,
+        weight,
+        firstName,
+        lastName,
+        fathersName,
+        diagnosis: '',
       };
+      console.log(data);
       if (id) {
         fetch(`${BASE_URL}${PATIENT}/${id}`, {
           method: 'POST',
           credentials: 'same-origin',
           headers: {
             Accept: 'application/json',
-            'Content-Type': 'application/x-www-form-urlencoded',
+            'Content-Type': 'application/json',
           },
           body: JSON.stringify(data),
         })
           .then(res => res.json())
           .then(result => {
             const updatedPatients = patients.map(patient => {
-              const { PatientID } = patient;
-              if (PatientID === result.PatientID) {
+              const { patientId } = patient;
+              if (patientId === result.patientId) {
                 return result;
               }
               return patient;
@@ -110,12 +111,11 @@ const PatientForm: React.FC<IPatientFormProps> = ({ id }): JSX.Element => {
           .catch(err => console.error(err));
       } else {
         fetch(`${BASE_URL}${PATIENT}`, {
-          method: 'POST',
-          credentials: 'same-origin',
           headers: {
             Accept: 'application/json',
-            'Content-Type': 'application/x-www-form-urlencoded',
+            'Content-Type': 'application/json',
           },
+          method: 'POST',
           body: JSON.stringify(data),
         })
           .then(res => res.json())
@@ -125,7 +125,7 @@ const PatientForm: React.FC<IPatientFormProps> = ({ id }): JSX.Element => {
             } else {
               setPatients([result]);
             }
-            history.push(`/doctor/patient/${result.PatientID}`);
+            history.push(`/doctor/patient/${result.patientId}`);
           })
           .catch(err => console.error(err));
       }
@@ -134,13 +134,13 @@ const PatientForm: React.FC<IPatientFormProps> = ({ id }): JSX.Element => {
 
   useEffect(() => {
     if (id) {
-      const patient = patients?.find(({ PatientID }) => PatientID === id);
-      setFieldValue('age', patient?.Age);
-      setFieldValue('fathersName', patient?.FathersName);
-      setFieldValue('firstName', patient?.FirstName);
-      setFieldValue('height', patient?.Height);
-      setFieldValue('lastName', patient?.LastName);
-      setFieldValue('weight', patient?.Weight);
+      const patient = patients?.find(({ patientId }) => patientId === id);
+      setFieldValue('age', patient?.age);
+      setFieldValue('fathersName', patient?.fathersName);
+      setFieldValue('firstName', patient?.firstName);
+      setFieldValue('height', patient?.height);
+      setFieldValue('lastName', patient?.lastName);
+      setFieldValue('weight', patient?.weight);
     }
   }, [id, patients, setFieldValue]);
 

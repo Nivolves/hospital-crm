@@ -2,6 +2,7 @@
   "name": "my-app",
   "version": "0.1.0",
   "private": true,
+  "proxy": "http://localhost:1323",
   "dependencies": {
     "@types/jest": "^24.9.1",
     "@types/node": "^12.12.26",

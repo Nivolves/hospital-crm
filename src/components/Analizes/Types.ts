@@ -1,9 +1,9 @@
 export interface IAddAnalizeProps {
-  id: number;
+  id: string;
   isModalOpen: boolean;
   setModal: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export interface IAnalizesProps {
-  id: number;
+  id: string;
 }

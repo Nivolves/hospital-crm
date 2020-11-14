@@ -20,11 +20,14 @@ const Analizes: React.FC<IAnalizesProps> = ({ id }): JSX.Element => {
   }));
 
   useEffect(() => {
-    fetch(`${BASE_URL}${ANALIZES}`)
+    fetch(`${BASE_URL}${ANALIZES}`, {
+      headers: {
+        patientId: id
+      }
+    })
       .then(res => res.json())
       .then(result => {
-        const patientAnalizes = result?.length ? result.filter(({ PatientID }) => PatientID === id).reverse() : [];
-        setAnalizes(patientAnalizes);
+        setAnalizes(result);
       })
       .catch(err => console.error(err));
   }, [id, setAnalizes]);
@@ -42,9 +45,9 @@ const Analizes: React.FC<IAnalizesProps> = ({ id }): JSX.Element => {
               <List
                 itemLayout="horizontal"
                 dataSource={analizes}
-                renderItem={({ Date: date, Name, Value }) => (
+                renderItem={({ date, name, value }) => (
                   <List.Item>
-                    <List.Item.Meta title={new Date(date).toLocaleDateString()} description={`${Name}  ${Value}`} />
+                    <List.Item.Meta title={new Date(date).toLocaleDateString()} description={`${name}  ${value}`} />
                   </List.Item>
                 )}
               ></List>

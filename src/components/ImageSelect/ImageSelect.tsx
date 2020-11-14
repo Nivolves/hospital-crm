@@ -1,44 +1,53 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 
 import { useRootData } from '../../hooks/useRootData';
 
 import { IImageSelectProps } from './Types';
 
-import { BASE_URL, STATIC } from '../../constants/API';
+import { BASE_URL, STATIC, IMAGES } from '../../constants/API';
 
 import './ImageSelect.scss';
 
 const ImageSelect: React.FC<IImageSelectProps> = ({ id, setData, setLink, setSrc, setType }): JSX.Element => {
-  const { images } = useRootData(({ images }) => ({
+  const { images, setImages } = useRootData(({ images, setImages }) => ({
     images: images.get(),
+    setImages
   }));
 
-  const patientImages = images?.length ? images.filter(({ PatientID }) => PatientID === id).reverse() : [];
+  useEffect(() => {
+    fetch(`${BASE_URL}${IMAGES}`, {
+      headers: {
+        patientId: id
+      }
+    })
+    .then(res => res.json())
+    .then(result => setImages(result))
+    .catch(err => console.error(err));
+  }, [id, setImages]);
 
   const handleImageSelect = useCallback(
-    (Link, Name, Type) => {
-      console.log(Link);
+    (link, name, type) => {
       setData([]);
-      setLink(Link);
-      setSrc(`${BASE_URL}${STATIC}${Name}`);
-      setType(Type);
+      setLink(link);
+      setSrc(`${BASE_URL}${STATIC}${name}`);
+      setType(type);
     },
     [setData, setLink, setSrc, setType],
   );
 
   return (
     <div className="images-container">
-      {!!patientImages.length &&
-        patientImages.map(({ ImageID, Name }, index) => {
+      {images && !!images.length &&
+        images.map(({ imageId, name }, index) => {
           return (
-            <div key={ImageID} className="image">
+            <div key={imageId} className="image">
               <img
-                onClick={() => handleImageSelect(patientImages[index - 1].Link, Name, patientImages[index - 1].Type)}
-                src={`${BASE_URL}${STATIC}${Name}`}
+                onClick={() => handleImageSelect(images[index].link, name, images[index].type)}
+                src={`${BASE_URL}${STATIC}${name}`}
                 alt="crop"
               />
               <br />
-              {Name}
+              {name}
             </div>
           );
         })}

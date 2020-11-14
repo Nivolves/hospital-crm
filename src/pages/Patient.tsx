@@ -25,11 +25,11 @@ const Patient: React.FC<RouteComponentProps<url>> = ({
 
   return (
     <>
-      <PatientForm id={+path} />
-      <Analizes id={+path} />
+      <PatientForm id={path} />
+      <Analizes id={path} />
       <ImageCrop
         data={data}
-        id={+path}
+        id={path}
         link={link}
         setData={setData}
         setLink={setLink}
@@ -45,7 +45,7 @@ const Patient: React.FC<RouteComponentProps<url>> = ({
           <TransformImages link={src as string} />
         </div>
       )}
-      <ImageSelect id={+path} setData={setData} setLink={setLink} setSrc={setSrc} setType={setType} />
+      <ImageSelect id={path} setData={setData} setLink={setLink} setSrc={setSrc} setType={setType} />
     </>
   );
 };
