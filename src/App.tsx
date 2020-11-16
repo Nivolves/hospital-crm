@@ -28,7 +28,7 @@ const App: React.FC<IAppProps> = ({ children }): JSX.Element => {
   }, []);
 
   useEffect(() => {
-    if(doctorId) {
+    if (doctorId) {
       fetch(`${BASE_URL}${PATIENTS}`, {
         headers: {
           doctorId,
@@ -42,58 +42,59 @@ const App: React.FC<IAppProps> = ({ children }): JSX.Element => {
 
   return (
     <>
-    {!!doctorId ? (
-      <Content>
-      <Layout style={{ background: '#fff', height: '100vh' }}>
-        <Sider width={200} style={{ background: '#fff' }}>
-          <Menu
-            mode="inline"
-            theme="dark"
-            defaultSelectedKeys={['1']}
-            defaultOpenKeys={['sub1']}
-            style={{ height: '100%' }}
-          >
-            {DOCKTOR_MENU.map(
-              (item): JSX.Element => {
-                if (item.children) {
-                  const { children, icon, title } = item;
-                  return (
-                    <SubMenu
-                      key={title}
-                      title={
-                        <span>
-                          <Icon type={icon} />
-                          {title}
-                        </span>
-                      }
-                    >
-                      {children.map(({ path, title }) => (
+      {!!doctorId ? (
+        <Content>
+          <Layout style={{ background: '#fff', height: '100vh' }}>
+            <Sider width={200} style={{ background: '#fff' }}>
+              <Menu
+                mode="inline"
+                theme="dark"
+                defaultSelectedKeys={['1']}
+                defaultOpenKeys={['sub1']}
+                style={{ height: '100%' }}
+              >
+                {DOCKTOR_MENU.map(
+                  (item): JSX.Element => {
+                    if (item.children) {
+                      const { children, icon, title } = item;
+                      return (
+                        <SubMenu
+                          key={title}
+                          title={
+                            <span>
+                              <Icon type={icon} />
+                              {title}
+                            </span>
+                          }
+                        >
+                          {children.map(({ path, title }) => (
+                            <Menu.Item key={path}>
+                              <Link to={path}>{title}</Link>
+                            </Menu.Item>
+                          ))}
+                        </SubMenu>
+                      );
+                    } else {
+                      const { icon, path, title } = item;
+                      return (
                         <Menu.Item key={path}>
-                          <Link to={path}>{title}</Link>
+                          <Link to={path || '/'}>
+                            <Icon type={icon} />
+                            <span>{title}</span>
+                          </Link>
                         </Menu.Item>
-                      ))}
-                    </SubMenu>
-                  );
-                } else {
-                  const { icon, path, title } = item;
-                  return (
-                    <Menu.Item key={path}>
-                      <Link to={path || '/'}>
-                        <Icon type={icon} />
-                        <span>{title}</span>
-                      </Link>
-                    </Menu.Item>
-                  );
-                }
-              },
-            )}
-          </Menu>
-        </Sider>
-        <Content style={{ padding: '50px 24px', minHeight: 280 }}>{children}</Content>
-      </Layout>
-    </Content>
-    ) : 
-    <Auth />}
+                      );
+                    }
+                  },
+                )}
+              </Menu>
+            </Sider>
+            <Content style={{ padding: '50px 24px', minHeight: 280 }}>{children}</Content>
+          </Layout>
+        </Content>
+      ) : (
+        <Auth />
+      )}
     </>
   );
 };

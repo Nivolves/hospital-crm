@@ -25,16 +25,19 @@ const ImageSelect: React.FC<IImageSelectProps> = ({ id, setData, setSelectedImag
       .catch(err => console.error(err));
   }, [id, setImages]);
 
-  const handleImageDelete = useCallback((id: string) => {
-    fetch(`${BASE_URL}${IMAGE}/${id}`, {
-      method: 'DELETE',
-    })
-      .then(() => setImages(images.filter(({ imageId }) => imageId !== id)))
-      .catch(err => console.error(err));
-  }, [images, setImages]);
+  const handleImageDelete = useCallback(
+    (id: string) => {
+      fetch(`${BASE_URL}${IMAGE}/${id}`, {
+        method: 'DELETE',
+      })
+        .then(() => setImages(images.filter(({ imageId }) => imageId !== id)))
+        .catch(err => console.error(err));
+    },
+    [images, setImages],
+  );
 
   const handleImageSelect = useCallback(
-    (image) => {
+    image => {
       setData([]);
       setSelectedImage(image);
       setSrc(`${BASE_URL}${STATIC}${image.name}`);
@@ -47,15 +50,13 @@ const ImageSelect: React.FC<IImageSelectProps> = ({ id, setData, setSelectedImag
     <div className="images-container">
       {images &&
         !!images.length &&
-        images.map((image) => {
+        images.map(image => {
           return (
             <div key={image.imageId} className="image">
-              <div className="delete-image" onClick={() => handleImageDelete(image.imageId)}>x</div>
-              <img
-                onClick={() => handleImageSelect(image)}
-                src={`${BASE_URL}${STATIC}${image.name}`}
-                alt="crop"
-              />
+              <div className="delete-image" onClick={() => handleImageDelete(image.imageId)}>
+                x
+              </div>
+              <img onClick={() => handleImageSelect(image)} src={`${BASE_URL}${STATIC}${image.name}`} alt="crop" />
               <br />
               {image.name}
             </div>

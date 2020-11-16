@@ -88,7 +88,7 @@ const SaveModal: React.FC<ISaveModalProps> = ({
         name: `${values.name}.png`,
         type: values.sensorType,
         link: link.substr(link.indexOf(',') + 1),
-        isCropped: !!isCropped
+        isCropped: !!isCropped,
       };
 
       fetch(`${BASE_URL}${IMAGE}`, {

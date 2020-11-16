@@ -137,7 +137,13 @@ const ImageCrop: React.FC<IImageCropProps> = ({
               onComplete={handleComplete}
               onChange={newCrop => setCrop(newCrop)}
             />
-            <AnalizeForm data={data} image={selectedImage as IImage} setData={setData} setTypeResult={setTypeResult} type={type} />
+            <AnalizeForm
+              data={data}
+              image={selectedImage as IImage}
+              setData={setData}
+              setTypeResult={setTypeResult}
+              type={type}
+            />
           </div>
           <div style={{ width: '20%' }}>
             {croppedImage && (

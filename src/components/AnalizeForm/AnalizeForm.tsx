@@ -44,7 +44,13 @@ const validationSchema = Yup.object({
   analizeType: Yup.string().required(requiredError),
 });
 
-const AnalizeForm: React.FC<IAnalizeFormProps> = ({ data: chartData, image, setData, setTypeResult, type }): JSX.Element => {
+const AnalizeForm: React.FC<IAnalizeFormProps> = ({
+  data: chartData,
+  image,
+  setData,
+  setTypeResult,
+  type,
+}): JSX.Element => {
   const [isLoading, setLoading] = useState<boolean>(false);
 
   const { images, setImages } = useRootData(({ images, setImages }) => ({
@@ -95,7 +101,7 @@ const AnalizeForm: React.FC<IAnalizeFormProps> = ({ data: chartData, image, setD
             return acc;
           }, []);
           setData(data);
-          if(image.isCropped) {
+          if (image.isCropped) {
             fetch(`${BASE_URL}${IMAGE}/${image.imageId}`, {
               method: 'DELETE',
             })
