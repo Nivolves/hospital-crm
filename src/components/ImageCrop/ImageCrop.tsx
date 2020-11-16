@@ -7,6 +7,7 @@ import SaveModal from '../SaveModal/SaveModal';
 import { Button, Icon, message, Upload } from 'antd';
 
 import { IImageCropProps } from './Types';
+import { IImage } from '../../Types/Common';
 import { UploadFile } from 'antd/lib/upload/interface';
 
 import 'react-image-crop/dist/ReactCrop.css';
@@ -15,9 +16,9 @@ import 'react-image-crop/dist/ReactCrop.css';
 const ImageCrop: React.FC<IImageCropProps> = ({
   data,
   id,
-  link,
+  selectedImage,
   setData,
-  setLink,
+  setSelectedImage,
   setSrc,
   setType,
   setTypeResult,
@@ -104,7 +105,7 @@ const ImageCrop: React.FC<IImageCropProps> = ({
         onCancel={handleCancel}
         openModal={openModal}
         visible={isModalOpen}
-        setLink={setLink}
+        setSelectedImage={setSelectedImage}
         setSrc={setSrc}
         setType={setType}
       />
@@ -136,7 +137,7 @@ const ImageCrop: React.FC<IImageCropProps> = ({
               onComplete={handleComplete}
               onChange={newCrop => setCrop(newCrop)}
             />
-            <AnalizeForm data={data} link={link} setData={setData} setTypeResult={setTypeResult} type={type} />
+            <AnalizeForm data={data} image={selectedImage as IImage} setData={setData} setTypeResult={setTypeResult} type={type} />
           </div>
           <div style={{ width: '20%' }}>
             {croppedImage && (
@@ -147,12 +148,13 @@ const ImageCrop: React.FC<IImageCropProps> = ({
                 </Button>
                 <SaveModal
                   id={id}
+                  isCropped
                   link={croppedImage as string}
                   title="Збереження"
                   onCancel={() => openCropModal(false)}
                   openModal={openCropModal}
                   visible={isCropModalOpen}
-                  setLink={setLink}
+                  setSelectedImage={setSelectedImage}
                   setSrc={setSrc}
                   setType={setType}
                   type={type}

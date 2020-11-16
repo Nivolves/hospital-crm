@@ -21,7 +21,9 @@ const PatientsTable: React.FC = (): JSX.Element => {
 
   const handleDeletePatient = useCallback(
     id => {
-      fetch(`${BASE_URL}${PATIENT}/delete/${id}`)
+      fetch(`${BASE_URL}${PATIENT}/${id}`, {
+        method: 'DELETE',
+      })
         .then(() => setPatients(patients.filter(({ patientId }) => patientId !== id)))
         .catch(err => console.error(err));
     },
@@ -29,7 +31,7 @@ const PatientsTable: React.FC = (): JSX.Element => {
   );
 
   return (
-    <Table rowKey="PatientID" dataSource={patients}>
+    <Table rowKey="patientId" dataSource={patients}>
       <Column
         onCellClick={(row: IPatient) => history.push(`/doctor/patient/${row.patientId}`)}
         title="Ім'я"

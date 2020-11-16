@@ -6,18 +6,23 @@ export const createStore = () => {
   const store = {
     analizes: observable.box<IAnalize[]>([]),
     images: observable.box<IImage[]>([]),
+    doctorId: observable.box<string>(''),
     patients: observable.box<IPatient[]>([]),
 
     setAnalizes(analizes: IAnalize[]): void {
       this.analizes.set(analizes);
     },
 
-    setPatients(patients: IPatient[]): void {
-      this.patients.set(patients);
-    },
-
     setImages(images: IImage[]): void {
       this.images.set(images);
+    },
+
+    setDoctor(doctor: string): void {
+      this.doctorId.set(doctor);
+    },
+
+    setPatients(patients: IPatient[]): void {
+      this.patients.set(patients);
     },
   };
 

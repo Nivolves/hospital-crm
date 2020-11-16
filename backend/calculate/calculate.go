@@ -7,7 +7,6 @@ import (
 	"os/exec"
 	"os"
 	"bufio"
-	"fmt"
 )
 
 type AnalizeType struct {
@@ -32,8 +31,8 @@ func Calculate(c echo.Context) error {
     return echo.NewHTTPError(http.StatusInternalServerError)
 	} 
 
-	fmt.Print("python3", "SystemBack/pythonfile.py", mydir + "/assets/" + analizeType.Name, analizeType.Task, analizeType.Sensor, mydir + "/assets/" + analizeType.SaveTransform, mydir + "/assets/" + analizeType.SaveBinarization);
-	fmt.Println(analizeType.Name)
+	// fmt.Print("python3", "SystemBack/pythonfile.py", mydir + "/assets/" + analizeType.Name, analizeType.Task, analizeType.Sensor, mydir + "/assets/" + analizeType.SaveTransform, mydir + "/assets/" + analizeType.SaveBinarization);
+	// fmt.Println(analizeType.Name)
 
 	cmd := exec.Command("python3", "SystemBack/pythonfile.py", mydir + "/assets/" + analizeType.Name, analizeType.Task, analizeType.Sensor, mydir + "/assets/" + analizeType.SaveTransform, mydir + "/assets/" + analizeType.SaveBinarization)
 

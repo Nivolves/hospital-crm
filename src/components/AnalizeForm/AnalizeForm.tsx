@@ -6,11 +6,12 @@ import { Button, Form, Select, Spin } from 'antd';
 
 import { IAnalizeFormProps } from './Types';
 
-import { CALCULATE, BASE_URL } from '../../constants/API';
+import { BASE_URL, CALCULATE, IMAGE } from '../../constants/API';
 import { ANALIZE_TYPES } from '../../constants/AnalizeTypes';
 import { FORM_ERRORS } from '../../constants/FormErrors';
 
 import { getTransformImages } from '../../utils/getTransformImages';
+import { useRootData } from '../../hooks/useRootData';
 
 const { requiredError } = FORM_ERRORS;
 const { Option } = Select;
@@ -43,13 +44,14 @@ const validationSchema = Yup.object({
   analizeType: Yup.string().required(requiredError),
 });
 
-const AnalizeForm: React.FC<IAnalizeFormProps> = ({
-  data: chartData,
-  link,
-  setData,
-  setTypeResult,
-}): JSX.Element => {
+const AnalizeForm: React.FC<IAnalizeFormProps> = ({ data: chartData, image, setData, setTypeResult, type }): JSX.Element => {
   const [isLoading, setLoading] = useState<boolean>(false);
+
+  const { images, setImages } = useRootData(({ images, setImages }) => ({
+    images: images.get(),
+    setImages,
+  }));
+
   const { errors, handleSubmit, setFieldValue, values } = useFormik({
     initialValues: {
       analizeType: '',
@@ -58,27 +60,20 @@ const AnalizeForm: React.FC<IAnalizeFormProps> = ({
     validationSchema,
     onSubmit(_, { resetForm }) {
       setLoading(true);
-      const [transformLink, binaryLink] = getTransformImages(link);
+      const [transformLink, binaryLink] = getTransformImages(image.name);
       const data = {
-        'name': 'test.png',
-        'task': '1',
-        'sensor': 'convex',
-        'saveTransform': 'test-transform.png',
-        'saveBinarization': 'test-binary.png'
+        name: image?.name,
+        task: '1',
+        sensor: type,
+        saveTransform: transformLink,
+        saveBinarization: binaryLink,
       };
-      // const data = {
-      //   name: 'test.png',
-      //   task: '1',
-      //   sensor: type,
-      //   saveTransform: transformLink,
-      //   saveBinarization: binaryLink,
-      // };
       fetch(`${BASE_URL}${CALCULATE}`, {
         method: 'POST',
         credentials: 'same-origin',
         headers: {
           Accept: 'application/json',
-          'Content-Type': 'application/x-www-form-urlencoded',
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify(data),
       })
@@ -90,7 +85,6 @@ const AnalizeForm: React.FC<IAnalizeFormProps> = ({
             'Результат модели МГУА': res.gmdh_result,
             'Результат леса классификации': res.forest_result,
           });
-
           const data = res.mean_signs.reduce((acc, item) => {
             const column = {
               name: `${item['feature']} (${item['result']}`,
@@ -101,6 +95,13 @@ const AnalizeForm: React.FC<IAnalizeFormProps> = ({
             return acc;
           }, []);
           setData(data);
+          if(image.isCropped) {
+            fetch(`${BASE_URL}${IMAGE}/${image.imageId}`, {
+              method: 'DELETE',
+            })
+              .then(() => setImages(images.filter(({ imageId }) => imageId !== image.imageId)))
+              .catch(err => console.error(err));
+          }
         })
         .catch(err => {
           setLoading(false);

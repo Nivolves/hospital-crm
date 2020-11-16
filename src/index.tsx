@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
+import firebase from 'firebase/app';
 
 import AddPatient from './pages/AddPatient';
 import App from './App';
@@ -10,11 +11,22 @@ import Patients from './pages/Patients';
 
 import { StoreProvider } from './store/context';
 
+
 import './index.scss';
 import 'antd/dist/antd.css';
 import 'react-quill/dist/quill.snow.css';
 
 import * as serviceWorker from './serviceWorker';
+
+firebase.initializeApp({
+  apiKey: 'AIzaSyA9NtTIkKCKn2pa7v8ZPFEbuqX_nn3X7J0',
+  authDomain: 'kpi-hospital-crm.firebaseapp.com',
+  databaseURL: 'https://kpi-hospital-crm.firebaseio.com',
+  projectId: 'kpi-hospital-crm',
+  storageBucket: 'kpi-hospital-crm.appspot.com',
+  messagingSenderId: '295495699268',
+  appId: '1:295495699268:web:efb5245aa66480fd296511'
+});
 
 ReactDOM.render(
   <StoreProvider>

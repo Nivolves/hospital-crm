@@ -1,11 +1,11 @@
-import { IAnalizeChartData } from '../../Types/Common';
+import { IAnalizeChartData, IImage } from '../../Types/Common';
 
 export interface IImageCropProps {
   data: IAnalizeChartData[] | undefined;
   id: string;
-  link: string;
+  selectedImage: IImage | undefined;
   setData: React.Dispatch<React.SetStateAction<IAnalizeChartData[] | undefined>>;
-  setLink: React.Dispatch<React.SetStateAction<string>>;
+  setSelectedImage: React.Dispatch<React.SetStateAction<IImage | undefined>>;
   setSrc: React.Dispatch<React.SetStateAction<string | ArrayBuffer | null>>;
   setType: React.Dispatch<React.SetStateAction<string>>;
   setTypeResult: React.Dispatch<React.SetStateAction<{ [key: string]: string } | undefined>>;

@@ -4,50 +4,60 @@ import { useRootData } from '../../hooks/useRootData';
 
 import { IImageSelectProps } from './Types';
 
-import { BASE_URL, STATIC, IMAGES } from '../../constants/API';
+import { BASE_URL, STATIC, IMAGES, IMAGE } from '../../constants/API';
 
 import './ImageSelect.scss';
 
-const ImageSelect: React.FC<IImageSelectProps> = ({ id, setData, setLink, setSrc, setType }): JSX.Element => {
+const ImageSelect: React.FC<IImageSelectProps> = ({ id, setData, setSelectedImage, setSrc, setType }): JSX.Element => {
   const { images, setImages } = useRootData(({ images, setImages }) => ({
     images: images.get(),
-    setImages
+    setImages,
   }));
 
   useEffect(() => {
     fetch(`${BASE_URL}${IMAGES}`, {
       headers: {
-        patientId: id
-      }
+        patientId: id,
+      },
     })
-    .then(res => res.json())
-    .then(result => setImages(result))
-    .catch(err => console.error(err));
+      .then(res => res.json())
+      .then(result => setImages(result))
+      .catch(err => console.error(err));
   }, [id, setImages]);
 
+  const handleImageDelete = useCallback((id: string) => {
+    fetch(`${BASE_URL}${IMAGE}/${id}`, {
+      method: 'DELETE',
+    })
+      .then(() => setImages(images.filter(({ imageId }) => imageId !== id)))
+      .catch(err => console.error(err));
+  }, [images, setImages]);
+
   const handleImageSelect = useCallback(
-    (link, name, type) => {
+    (image) => {
       setData([]);
-      setLink(link);
-      setSrc(`${BASE_URL}${STATIC}${name}`);
-      setType(type);
+      setSelectedImage(image);
+      setSrc(`${BASE_URL}${STATIC}${image.name}`);
+      setType(image.type);
     },
-    [setData, setLink, setSrc, setType],
+    [setData, setSelectedImage, setSrc, setType],
   );
 
   return (
     <div className="images-container">
-      {images && !!images.length &&
-        images.map(({ imageId, name }, index) => {
+      {images &&
+        !!images.length &&
+        images.map((image) => {
           return (
-            <div key={imageId} className="image">
+            <div key={image.imageId} className="image">
+              <div className="delete-image" onClick={() => handleImageDelete(image.imageId)}>x</div>
               <img
-                onClick={() => handleImageSelect(images[index].link, name, images[index].type)}
-                src={`${BASE_URL}${STATIC}${name}`}
+                onClick={() => handleImageSelect(image)}
+                src={`${BASE_URL}${STATIC}${image.name}`}
                 alt="crop"
               />
               <br />
-              {name}
+              {image.name}
             </div>
           );
         })}

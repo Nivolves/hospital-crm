@@ -57,7 +57,8 @@ const validationSchema = Yup.object({
 });
 
 const PatientForm: React.FC<IPatientFormProps> = ({ id }): JSX.Element => {
-  const { patients, setPatients } = useRootData(({ patients, setPatients }) => ({
+  const { doctorId, patients, setPatients } = useRootData(({ doctorId, patients, setPatients }) => ({
+    doctorId: doctorId.get(),
     patients: patients.get(),
     setPatients,
   }));
@@ -78,7 +79,7 @@ const PatientForm: React.FC<IPatientFormProps> = ({ id }): JSX.Element => {
     onSubmit({ age, fathersName, firstName, height, lastName, weight }) {
       const data = {
         age,
-        doctorId: 1,
+        doctorId,
         height,
         weight,
         firstName,
@@ -86,7 +87,6 @@ const PatientForm: React.FC<IPatientFormProps> = ({ id }): JSX.Element => {
         fathersName,
         diagnosis: '',
       };
-      console.log(data);
       if (id) {
         fetch(`${BASE_URL}${PATIENT}/${id}`, {
           method: 'POST',

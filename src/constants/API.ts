@@ -2,6 +2,7 @@ export const BASE_URL = '/';
 export const CALCULATE = 'calculate';
 export const ANALIZE = 'analize';
 export const ANALIZES = 'analizes';
+export const DOCTOR = 'doctor';
 export const IMAGE = 'image';
 export const IMAGES = 'images';
 export const PATIENT = 'patient';

@@ -88,6 +88,28 @@ func AddImage(c echo.Context) error {
 	return c.JSON(http.StatusOK, image)
 }
 
+func DeleteImage(c echo.Context) error {
+	imagetId := c.Param("id")
+	client, ctx := db.GetDb()
+	collection := client.Database("hospital-crm").Collection("images")
+
+	oid, err := primitive.ObjectIDFromHex(imagetId)
+	if err != nil {
+		log.Printf("Failed GET images request: %s\n", err)
+    return echo.NewHTTPError(http.StatusInternalServerError)
+	}
+
+	_, err = collection.DeleteOne(context.Background(), bson.M{"_id": oid})
+	if err != nil {
+    log.Printf("Failed DELETE patient request: %s\n", err)
+    return echo.NewHTTPError(http.StatusInternalServerError)
+	}
+
+	defer client.Disconnect(ctx)
+
+	return c.String(http.StatusOK, imagetId)
+}
+
 func GetImages(c echo.Context) error {
 	client, ctx := db.GetDb()
 	collection := client.Database("hospital-crm").Collection("images")

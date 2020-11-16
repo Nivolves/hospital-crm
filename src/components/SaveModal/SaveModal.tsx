@@ -56,12 +56,13 @@ const validate = values => {
 
 const SaveModal: React.FC<ISaveModalProps> = ({
   id,
+  isCropped,
   link,
   title,
   visible,
   onCancel,
   openModal,
-  setLink,
+  setSelectedImage,
   setSrc,
   setType,
   type,
@@ -83,10 +84,11 @@ const SaveModal: React.FC<ISaveModalProps> = ({
       resetForm();
       openModal(false);
       const data = {
-        PatientID: id,
-        Name: `${values.name}.png`,
-        Type: values.sensorType,
-        Link: link.substr(link.indexOf(',') + 1),
+        patientId: id,
+        name: `${values.name}.png`,
+        type: values.sensorType,
+        link: link.substr(link.indexOf(',') + 1),
+        isCropped: !!isCropped
       };
 
       fetch(`${BASE_URL}${IMAGE}`, {
@@ -94,15 +96,15 @@ const SaveModal: React.FC<ISaveModalProps> = ({
         credentials: 'same-origin',
         headers: {
           Accept: 'application/json',
-          'Content-Type': 'application/x-www-form-urlencoded',
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify(data),
       })
         .then(res => res.json())
         .then(result => {
-          setLink(result.Link);
-          setSrc(`${BASE_URL}${STATIC}${result.Name}`);
-          setType(result.Type);
+          setSelectedImage(result);
+          setSrc(`${BASE_URL}${STATIC}${result.name}`);
+          setType(result.type);
           if (images) {
             setImages([...images, result]);
           } else {

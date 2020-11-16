@@ -22,8 +22,8 @@ const Analizes: React.FC<IAnalizesProps> = ({ id }): JSX.Element => {
   useEffect(() => {
     fetch(`${BASE_URL}${ANALIZES}`, {
       headers: {
-        patientId: id
-      }
+        patientId: id,
+      },
     })
       .then(res => res.json())
       .then(result => {

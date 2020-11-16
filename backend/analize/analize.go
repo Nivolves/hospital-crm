@@ -1,4 +1,4 @@
-package analizes
+package analize
 
 import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -12,8 +12,8 @@ import (
 )
 
 type Analize struct {
-	AnalizeId primitive.ObjectID	`bson:"_id" json:"analizeId,omitempty"`
-	PatientId primitive.ObjectID 	`json:"patientId,omitempty"`
+	AnalizeID primitive.ObjectID	`bson:"_id" json:"analizeId,omitempty"`
+	PatientID primitive.ObjectID 	`json:"patientId,omitempty"`
 	Name			string 	`json:"name,omitempty"`
 	Value     string	`json:"value,omitempty"`
 	Date     	time.Time	`json:"date,omitempty"`
@@ -34,7 +34,7 @@ func AddAnalize(c echo.Context) error {
 	collection := client.Database("hospital-crm").Collection("analizes")
 
 	insertResult, err := collection.InsertOne(context.Background(), map[string]interface{}{
-		"patientId": analize.PatientId,
+		"patientId": analize.PatientID,
 		"name": analize.Name,
 		"value": analize.Value,
 		"date": analize.Date,
@@ -44,7 +44,7 @@ func AddAnalize(c echo.Context) error {
     return echo.NewHTTPError(http.StatusInternalServerError)
 	}
 
-	analize.AnalizeId = insertResult.InsertedID.(primitive.ObjectID);
+	analize.AnalizeID = insertResult.InsertedID.(primitive.ObjectID);
 
 	defer client.Disconnect(ctx)
 

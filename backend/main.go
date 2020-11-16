@@ -2,7 +2,8 @@ package main
 
 import (
 	"./calculate"
-	"./analizes"
+	"./analize"
+	"./doctor"
 	"./patient"
 	"./image"
 	"github.com/labstack/echo"
@@ -11,12 +12,16 @@ import (
 func main() {
 	e := echo.New()
 
-	e.POST("/analize", analizes.AddAnalize)
-	e.GET("/analizes", analizes.GetAnalizes)
+	e.POST("/analize", analize.AddAnalize)
+	e.GET("/analizes", analize.GetAnalizes)
 	e.POST("/calculate", calculate.Calculate)
+	e.POST("/doctor", doctor.AddDoctor)
+	e.GET("/doctor/:id", doctor.GetDoctor)
 	e.POST("/image", image.AddImage)
+	e.DELETE("/image/:id", image.DeleteImage)
 	e.GET("/images", image.GetImages)
 	e.POST("/patient", patient.AddPatient)
+	e.DELETE("/patient/:id", patient.DeletePatient)
 	e.GET("/patients", patient.GetPatients)
 
 	e.Static("/", "../build")

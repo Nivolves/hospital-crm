@@ -14,7 +14,8 @@ export interface IAnalizeChartData {
 
 export interface IImage {
   date: string;
-  imageId: number;
+  imageId: string;
+  isCropped: boolean;
   link: string;
   name: string;
   patientId: number;

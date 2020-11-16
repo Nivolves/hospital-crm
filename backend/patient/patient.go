@@ -8,12 +8,11 @@ import (
 	"../db"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"strconv"
 )
 
 type Patient struct {
 	PatientID  	primitive.ObjectID `bson:"_id" json:"patientId,omitempty"`
-	DoctorID 		int `json:"doctorId,omitempty"`
+	DoctorID 		primitive.ObjectID `json:"doctorId,omitempty"`
 	Age 				int `json:"age,omitempty"`
 	Height      float32 `json:"height,omitempty"`
 	Weight      float32 `json:"weight,omitempty"`
@@ -56,16 +55,39 @@ func AddPatient(c echo.Context) error {
 	return c.JSON(http.StatusOK, patient)
 }
 
+func DeletePatient(c echo.Context) error {
+	patientId := c.Param("id")
+	client, ctx := db.GetDb()
+	collection := client.Database("hospital-crm").Collection("patients")
+
+	oid, err := primitive.ObjectIDFromHex(patientId)
+	if err != nil {
+		log.Printf("Failed GET images request: %s\n", err)
+    return echo.NewHTTPError(http.StatusInternalServerError)
+	}
+
+	_, err = collection.DeleteOne(context.Background(), bson.M{"_id": oid})
+	if err != nil {
+    log.Printf("Failed DELETE patient request: %s\n", err)
+    return echo.NewHTTPError(http.StatusInternalServerError)
+	}
+
+	defer client.Disconnect(ctx)
+
+	return c.String(http.StatusOK, patientId)
+}
+
 func GetPatients(c echo.Context) error {
 	client, ctx := db.GetDb()
 	collection := client.Database("hospital-crm").Collection("patients")
-	doctor := c.Request().Header.Get("doctorId")
-	doctorId, err := strconv.Atoi(doctor)
+	doctorId := c.Request().Header.Get("doctorId")
+	oid, err := primitive.ObjectIDFromHex(doctorId)
 	if err != nil {
-    log.Printf("Failed GET patients request: %s\n", err)
+		log.Printf("Failed GET images request: %s\n", err)
     return echo.NewHTTPError(http.StatusInternalServerError)
 	}
-	cur, err := collection.Find(context.Background(), bson.D{primitive.E{Key: "doctorId", Value: doctorId}})
+
+	cur, err := collection.Find(context.Background(), bson.D{primitive.E{Key: "doctorId", Value: oid}})
 	if err != nil {
     log.Printf("Failed GET patients request: %s\n", err)
     return echo.NewHTTPError(http.StatusInternalServerError)

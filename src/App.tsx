@@ -1,6 +1,10 @@
 import React, { useEffect } from 'react';
+import firebase from 'firebase/app';
+import 'firebase/auth';
 import { Link } from 'react-router-dom';
 import { Layout, Menu, Icon } from 'antd';
+
+import Auth from './components/Auth/Auth';
 
 import { useRootData } from './hooks/useRootData';
 
@@ -13,23 +17,33 @@ const { SubMenu } = Menu;
 const { Content, Sider } = Layout;
 
 const App: React.FC<IAppProps> = ({ children }): JSX.Element => {
-  const { setPatients } = useRootData(({ setPatients }) => ({
+  const { doctorId, setDoctor, setPatients } = useRootData(({ doctorId, setDoctor, setPatients }) => ({
+    doctorId: doctorId.get(),
+    setDoctor,
     setPatients,
   }));
 
   useEffect(() => {
-    fetch(`${BASE_URL}${PATIENTS}`,{
-      headers: {
-        doctorId: '1'
-      }
-    })
-      .then(res => res.json())
-      .then(result => setPatients(result))
-      .catch(err => console.error(err));
-  }, [setPatients]);
+    //TODO: impliments user remember
+  }, []);
+
+  useEffect(() => {
+    if(doctorId) {
+      fetch(`${BASE_URL}${PATIENTS}`, {
+        headers: {
+          doctorId,
+        },
+      })
+        .then(res => res.json())
+        .then(result => setPatients(result))
+        .catch(err => console.error(err));
+    }
+  }, [setPatients, doctorId]);
 
   return (
-    <Content>
+    <>
+    {!!doctorId ? (
+      <Content>
       <Layout style={{ background: '#fff', height: '100vh' }}>
         <Sider width={200} style={{ background: '#fff' }}>
           <Menu
@@ -78,6 +92,9 @@ const App: React.FC<IAppProps> = ({ children }): JSX.Element => {
         <Content style={{ padding: '50px 24px', minHeight: 280 }}>{children}</Content>
       </Layout>
     </Content>
+    ) : 
+    <Auth />}
+    </>
   );
 };
 
