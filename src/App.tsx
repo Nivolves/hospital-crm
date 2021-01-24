@@ -1,6 +1,4 @@
 import React, { useEffect } from 'react';
-import firebase from 'firebase/app';
-import 'firebase/auth';
 import { Link } from 'react-router-dom';
 import { Layout, Menu, Icon } from 'antd';
 
@@ -17,9 +15,8 @@ const { SubMenu } = Menu;
 const { Content, Sider } = Layout;
 
 const App: React.FC<IAppProps> = ({ children }): JSX.Element => {
-  const { doctorId, setDoctor, setPatients } = useRootData(({ doctorId, setDoctor, setPatients }) => ({
+  const { doctorId, setPatients } = useRootData(({ doctorId, setPatients }) => ({
     doctorId: doctorId.get(),
-    setDoctor,
     setPatients,
   }));
 

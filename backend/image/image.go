@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 
 	"image/png"
+	// Register jpeg to png conventer
 	_ "image/jpeg"
 	_ "golang.org/x/image/bmp"
 
@@ -16,17 +17,18 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"log"
-	"../db"
+	"hospital-backend/db"
 	"net/http"
 	"context"
 )
 
+// Image is a representation of a image
 type Image struct {
 	ImageID   primitive.ObjectID `bson:"_id" json:"imageId,omitempty"`
 	PatientID primitive.ObjectID `json:"patientId,omitempty"`
 	Name      string `json:"name,omitempty"`
 	Type      string `json:"type,omitempty"`
-	Date      time.Time `json:"date,omitempty"`
+	Date      string `json:"date,omitempty"`
 	Link      string `json:"link,omitempty"`
 	IsCropped bool `json:"isCropped,omitempty"`
 }
@@ -56,6 +58,7 @@ func (img *Image) createImage() {
 	img.Link = filename
 }
 
+// AddImage is a representation of a image
 func AddImage(c echo.Context) error {
 	client, ctx := db.GetDb()
 	image := &Image{}
@@ -66,7 +69,7 @@ func AddImage(c echo.Context) error {
 	}
 
 	image.createImage()
-	image.Date = time.Now()
+	image.Date = time.Now().Format("02/01/2006")
 
 	collection := client.Database("hospital-crm").Collection("images")
 	insertResult, err := collection.InsertOne(context.Background(), map[string]interface{}{
@@ -88,12 +91,13 @@ func AddImage(c echo.Context) error {
 	return c.JSON(http.StatusOK, image)
 }
 
+// DeleteImage is a representation of a image
 func DeleteImage(c echo.Context) error {
-	imagetId := c.Param("id")
+	imagetID := c.Param("id")
 	client, ctx := db.GetDb()
 	collection := client.Database("hospital-crm").Collection("images")
 
-	oid, err := primitive.ObjectIDFromHex(imagetId)
+	oid, err := primitive.ObjectIDFromHex(imagetID)
 	if err != nil {
 		log.Printf("Failed GET images request: %s\n", err)
     return echo.NewHTTPError(http.StatusInternalServerError)
@@ -107,21 +111,58 @@ func DeleteImage(c echo.Context) error {
 
 	defer client.Disconnect(ctx)
 
-	return c.String(http.StatusOK, imagetId)
+	return c.String(http.StatusOK, imagetID)
 }
 
+// GetImages is a representation of a image
 func GetImages(c echo.Context) error {
 	client, ctx := db.GetDb()
 	collection := client.Database("hospital-crm").Collection("images")
-	patientId := c.Request().Header.Get("patientId")
+	patientID := c.Request().Header.Get("patientId")
 
-	oid, err := primitive.ObjectIDFromHex(patientId)
+	oid, err := primitive.ObjectIDFromHex(patientID)
 	if err != nil {
 		log.Printf("Failed GET images request: %s\n", err)
     return echo.NewHTTPError(http.StatusInternalServerError)
 	}
 
 	cur, err := collection.Find(context.Background(), bson.D{primitive.E{Key: "patientId", Value: oid}})
+	if err != nil {
+    log.Printf("Failed GET images request: %s\n", err)
+    return echo.NewHTTPError(http.StatusInternalServerError)
+	}
+	var images []*Image
+
+	defer cur.Close(context.Background())
+
+	for cur.Next(context.Background()) {
+    var image Image
+    err := cur.Decode(&image)
+    if err != nil {
+			log.Printf("Failed GET images request: %s\n", err)
+			return echo.NewHTTPError(http.StatusInternalServerError)
+    }
+
+    images = append(images, &image)
+	}
+
+	if err := cur.Err(); err != nil {
+		log.Printf("Failed GET images request: %s\n", err)
+		return echo.NewHTTPError(http.StatusInternalServerError)
+	}
+	cur.Close(context.Background())
+
+	defer client.Disconnect(ctx)
+
+	return c.JSON(http.StatusOK, images)
+}
+
+// GetAllImages is a representation of a images
+func GetAllImages(c echo.Context) error {
+	client, ctx := db.GetDb()
+	collection := client.Database("hospital-crm").Collection("images")
+
+	cur, err := collection.Find(context.Background(), bson.D{})
 	if err != nil {
     log.Printf("Failed GET images request: %s\n", err)
     return echo.NewHTTPError(http.StatusInternalServerError)

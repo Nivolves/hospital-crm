@@ -6,16 +6,18 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"log"
 	"net/http"
-	"../db"
+	"hospital-backend/db"
 	"context"
 )
 
+// Doctor is a representation of a doctor
 type Doctor struct {
 	DoctorID		primitive.ObjectID `bson:"_id" json:"doctorId,omitempty"`
 	Role				string `json:"role,omitempty"`
 	FirebaseUID	string `json:"firebaseUID,omitempty"`     
 }
 
+// AddDoctor is a representation of a doctor
 func AddDoctor(c echo.Context) error {
 	client, ctx := db.GetDb()
 	doctor := Doctor{}
@@ -41,13 +43,14 @@ func AddDoctor(c echo.Context) error {
 	return c.JSON(http.StatusOK, insertResult)
 }
 
+// GetDoctor is a representation of a doctor
 func GetDoctor(c echo.Context) error {
-	firebaseId := c.Param("id")
+	firebaseID := c.Param("id")
 	client, ctx := db.GetDb()
 	collection := client.Database("hospital-crm").Collection("doctors")
 	var doctor Doctor
 
-	err := collection.FindOne(context.Background(), bson.M{"firebaseUID": firebaseId}).Decode(&doctor);
+	err := collection.FindOne(context.Background(), bson.M{"firebaseUID": firebaseID}).Decode(&doctor);
 	if err != nil {
     log.Printf("Failed GET patients request: %s\n", err)
     return echo.NewHTTPError(http.StatusInternalServerError)

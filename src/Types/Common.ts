@@ -24,6 +24,7 @@ export interface IImage {
 
 export interface IPatient {
   age: number;
+  date: string;
   diagnosis: string;
   doctorId: string;
   fathersName: string;

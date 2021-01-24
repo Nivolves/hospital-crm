@@ -4,6 +4,7 @@ import { BrowserRouter, Switch, Route } from 'react-router-dom';
 import firebase from 'firebase/app';
 
 import AddPatient from './pages/AddPatient';
+import AllImages from './pages/AllImages';
 import App from './App';
 import DocktorsRegister from './components/DocktorsRegister/DocktorsRegister';
 import Patient from './pages/Patient';
@@ -36,6 +37,7 @@ ReactDOM.render(
           <Route path="/doctor/add-patient" exact component={AddPatient} />
           <Route path="/doctor/patient/:path" component={Patient} />
           <Route path="/doctor/patients" exact component={Patients} />
+          <Route path="/doctor/images/all" exact component={AllImages} />
         </Switch>
       </App>
     </BrowserRouter>

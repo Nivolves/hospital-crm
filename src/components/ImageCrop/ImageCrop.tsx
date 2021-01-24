@@ -130,7 +130,6 @@ const ImageCrop: React.FC<IImageCropProps> = ({
           <div style={{ width: '80%' }}>
             <ReactCrop
               crossorigin="anonymous"
-              style={{ display: 'block' }}
               onImageLoaded={image => setImage(image)}
               src={src as string}
               crop={crop}

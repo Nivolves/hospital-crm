@@ -9,6 +9,7 @@ import (
 	"bufio"
 )
 
+// AnalizeType is a representation of a calculate
 type AnalizeType struct {
 	Name 							string	`json:"name,omitempty"`
 	Task 							string	`json:"task,omitempty"`
@@ -17,6 +18,7 @@ type AnalizeType struct {
 	SaveBinarization 	string	`json:"saveBinarization,omitempty"`
 }
 
+// Calculate is a representation of a calculate
 func Calculate(c echo.Context) error {
 	analizeType := &AnalizeType{}
 	err := c.Bind(analizeType)

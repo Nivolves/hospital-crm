@@ -85,10 +85,10 @@ const Auth: React.FC = (): JSX.Element => {
         {AUTH_VARIANTS.map((variant, index) => (
           <TabPane tab={variant} key={(index + 1).toString()}>
             <Form {...layout} name="basic" onSubmit={handleSubmit}>
-              <Form.Item label="Email" validateStatus={errors.email ? 'error' : ''} help={errors.email || ''}>
+              <Form.Item label="Пошта" validateStatus={errors.email ? 'error' : ''} help={errors.email || ''}>
                 <Input onChange={handleChange} id="email" />
               </Form.Item>
-              <Form.Item label="Password" validateStatus={errors.password ? 'error' : ''} help={errors.password || ''}>
+              <Form.Item label="Пароль" validateStatus={errors.password ? 'error' : ''} help={errors.password || ''}>
                 <Input.Password onChange={handleChange} id="password" />
               </Form.Item>
               <Form.Item {...tailLayout}>

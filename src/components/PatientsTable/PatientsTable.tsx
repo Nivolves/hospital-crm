@@ -45,11 +45,17 @@ const PatientsTable: React.FC = (): JSX.Element => {
         key="lastName"
       />
       <Column
+        onCellClick={(row: IPatient) => history.push(`/doctor/patient/${row.patientId}`)}
+        title="Дата"
+        dataIndex="date"
+        key="date"
+      />
+      <Column
         onCellClick={(values: IPatient) => handleDeletePatient(values.patientId)}
-        title="Action"
+        title="Видалити"
         key="action"
         render={() => {
-          return <a>Delete</a>;
+          return <a>Видалити</a>;
         }}
       />
     </Table>

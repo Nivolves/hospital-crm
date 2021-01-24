@@ -3,7 +3,7 @@ package analize
 import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/bson"
-	"../db"
+	"hospital-backend/db"
 	"time"
 	"github.com/labstack/echo"
 	"log"
@@ -11,6 +11,7 @@ import (
 	"context"
 )
 
+// Analize is a representation of a analize
 type Analize struct {
 	AnalizeID primitive.ObjectID	`bson:"_id" json:"analizeId,omitempty"`
 	PatientID primitive.ObjectID 	`json:"patientId,omitempty"`
@@ -19,6 +20,7 @@ type Analize struct {
 	Date     	time.Time	`json:"date,omitempty"`
 }
 
+// AddAnalize is a representation of a analize
 func AddAnalize(c echo.Context) error {
 	client, ctx := db.GetDb()
 	analize := Analize{}
@@ -51,12 +53,13 @@ func AddAnalize(c echo.Context) error {
 	return c.JSON(http.StatusOK, analize)
 }
 
+// GetAnalizes is a representation of a analize
 func GetAnalizes(c echo.Context) error {
 	client, ctx := db.GetDb()
 	collection := client.Database("hospital-crm").Collection("analizes")
-	patientId := c.Request().Header.Get("patientId")
+	patientID := c.Request().Header.Get("patientId")
 
-	oid, err := primitive.ObjectIDFromHex(patientId)
+	oid, err := primitive.ObjectIDFromHex(patientID)
 	if err != nil {
 		log.Printf("Failed GET analizes request: %s\n", err)
     return echo.NewHTTPError(http.StatusInternalServerError)
