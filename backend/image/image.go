@@ -31,6 +31,7 @@ type Image struct {
 	Date      string `json:"date,omitempty"`
 	Link      string `json:"link,omitempty"`
 	IsCropped bool `json:"isCropped,omitempty"`
+	IsVisible bool `json:"isVisible,omitempty"`
 }
 
 func (img *Image) createImage() {
@@ -78,6 +79,7 @@ func AddImage(c echo.Context) error {
 		"type": image.Type,
 		"date": image.Date,
 		"isCropped": image.IsCropped,
+		"isVisible": true,
 	})
 	if err != nil {
     log.Printf("Failed POST image request: %s\n", err)
@@ -103,11 +105,17 @@ func DeleteImage(c echo.Context) error {
     return echo.NewHTTPError(http.StatusInternalServerError)
 	}
 
-	_, err = collection.DeleteOne(context.Background(), bson.M{"_id": oid})
-	if err != nil {
-    log.Printf("Failed DELETE patient request: %s\n", err)
-    return echo.NewHTTPError(http.StatusInternalServerError)
-	}
+	// _, err = collection.DeleteOne(context.Background(), bson.M{"_id": oid})
+	// if err != nil {
+  //   log.Printf("Failed DELETE patient request: %s\n", err)
+  //   return echo.NewHTTPError(http.StatusInternalServerError)
+	// }
+
+	_, err = collection.UpdateOne(
+		context.Background(),
+		bson.D{primitive.E{Key: "patientId", Value: oid}},
+		bson.M{"$set": bson.M{"isVisible": false}},
+	)
 
 	defer client.Disconnect(ctx)
 
@@ -126,7 +134,7 @@ func GetImages(c echo.Context) error {
     return echo.NewHTTPError(http.StatusInternalServerError)
 	}
 
-	cur, err := collection.Find(context.Background(), bson.D{primitive.E{Key: "patientId", Value: oid}})
+	cur, err := collection.Find(context.Background(), bson.D{primitive.E{Key: "patientId", Value: oid}, primitive.E{Key: "isVisible", Value: true}})
 	if err != nil {
     log.Printf("Failed GET images request: %s\n", err)
     return echo.NewHTTPError(http.StatusInternalServerError)

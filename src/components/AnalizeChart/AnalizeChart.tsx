@@ -8,11 +8,16 @@ const AnalizeChart: React.FC<IAnalizeChartProps> = ({ data, typeResult }): JSX.E
   console.log(data);
   return (
     <div>
-      <BarChart style={{ marginTop: 30 }} width={730} height={250} data={data.map(chart => ({
-        ...chart,
-        Норма: Math.round(chart['Норма'] * 1000) / 1000,
-        Патологія: Math.round(chart['Патологія'] * 1000) / 1000
-      }))}>
+      <BarChart
+        style={{ marginTop: 30 }}
+        width={730}
+        height={250}
+        data={data.map(chart => ({
+          ...chart,
+          Норма: Math.round(chart['Норма'] * 1000) / 1000,
+          Патологія: Math.round(chart['Патологія'] * 1000) / 1000,
+        }))}
+      >
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="name" />
         <YAxis />
