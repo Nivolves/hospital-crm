@@ -93,7 +93,7 @@ const Auth: React.FC = (): JSX.Element => {
               </Form.Item>
               <Form.Item {...tailLayout}>
                 <Button type="primary" htmlType="submit">
-                  Submit
+                  Ввійти  
                 </Button>
               </Form.Item>
             </Form>
