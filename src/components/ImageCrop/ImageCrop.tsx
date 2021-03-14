@@ -129,6 +129,7 @@ const ImageCrop: React.FC<IImageCropProps> = ({
         <div style={{ display: 'flex' }}>
           <div style={{ width: '80%' }}>
             <ReactCrop
+              style={{display: 'inline-block'}}
               crossorigin="anonymous"
               onImageLoaded={image => setImage(image)}
               src={src as string}

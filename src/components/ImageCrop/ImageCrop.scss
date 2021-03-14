@@ -1,4 +1,8 @@
-.ReactCrop__image {
-  width: 100%;
-  height: auto;
+.ReactCrop {
+  display: inline-block !important;
+
+  &__image {
+    width: 100%;
+    height: auto;
+  }
 }
