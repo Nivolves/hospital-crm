@@ -113,7 +113,7 @@ func DeleteImage(c echo.Context) error {
 
 	_, err = collection.UpdateOne(
 		context.Background(),
-		bson.D{primitive.E{Key: "patientId", Value: oid}},
+		bson.D{primitive.E{Key: "_id", Value: oid}},
 		bson.M{"$set": bson.M{"isVisible": false}},
 	)
 

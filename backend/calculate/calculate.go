@@ -1,6 +1,7 @@
 package calculate
 
 import (
+	"fmt"
 	"github.com/labstack/echo"
 	"net/http"
 	"log"
@@ -56,5 +57,6 @@ func Calculate(c echo.Context) error {
 
 	cmd.Wait()
 
+	fmt.Print(text)
 	return c.JSON(http.StatusOK, text)
 }
