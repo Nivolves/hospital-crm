@@ -9,8 +9,9 @@ import PatientForm from '../components/PatientForm/PatientForm';
 import TransformImages from '../components/TransformImages/TransformImages';
 
 import { IAnalizeChartData, IImage } from '../Types/Common';
-
 import { url } from './Types';
+
+import { TYPICAL_IMAGES } from '../constants/TypicalImages';
 
 const Patient: React.FC<RouteComponentProps<url>> = ({
   match: {
@@ -22,6 +23,8 @@ const Patient: React.FC<RouteComponentProps<url>> = ({
   const [src, setSrc] = useState<string | ArrayBuffer | null>('');
   const [type, setType] = useState<string>('');
   const [typeResult, setTypeResult] = useState<{ [key: string]: string }>();
+
+  console.log(type);
 
   return (
     <>
@@ -41,7 +44,17 @@ const Patient: React.FC<RouteComponentProps<url>> = ({
       />
       {data && !!data.length && typeResult && !!Object.values(typeResult).length && (
         <div style={{ display: 'flex', justifyContent: 'space-around' }}>
-          <AnalizeChart data={data} typeResult={typeResult} />
+          <div>
+            <AnalizeChart data={data} typeResult={typeResult} />
+            <div style={{ display: 'flex'}}>
+              {TYPICAL_IMAGES[type].map(({image, name}) => (
+                <div style={{ margin: 10 }}>
+                  <img src={image} alt={name} style={{ display: 'block' }}/>
+                  <p>{name}</p>
+                </div>
+              ))}
+            </div>
+          </div>
           <TransformImages link={src as string} />
         </div>
       )}

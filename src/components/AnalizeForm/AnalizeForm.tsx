@@ -93,7 +93,7 @@ const AnalizeForm: React.FC<IAnalizeFormProps> = ({
           });
           const data = res.mean_signs.reduce((acc, item) => {
             const column = {
-              name: `${item['feature']} (${item['result']}`,
+              name: `${item['feature']} (${item['result']})`,
               Норма: item['value'],
               Патологія: item['threshold'],
             };
