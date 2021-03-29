@@ -46,10 +46,10 @@ const Patient: React.FC<RouteComponentProps<url>> = ({
         <div style={{ display: 'flex', justifyContent: 'space-around' }}>
           <div>
             <AnalizeChart data={data} typeResult={typeResult} />
-            <div style={{ display: 'flex'}}>
-              {TYPICAL_IMAGES[type].map(({image, name}) => (
+            <div style={{ display: 'flex' }}>
+              {TYPICAL_IMAGES[type].map(({ image, name }) => (
                 <div style={{ margin: 10 }}>
-                  <img src={image} alt={name} style={{ display: 'block' }}/>
+                  <img src={image} alt={name} style={{ display: 'block' }} />
                   <p>{name}</p>
                 </div>
               ))}
