@@ -28,7 +28,7 @@ export const TYPICAL_IMAGES = {
       { image: convexHorNorm, name: 'Норма' },
       { image: convexHorPatology, name: 'Патологія' },
       { image: convexHorStrangeNorm, name: 'Не визначено' },
-    ]
+    ],
   },
   linear: {
     vert: [
@@ -40,7 +40,7 @@ export const TYPICAL_IMAGES = {
       { image: linearHorNorm, name: 'Норма' },
       { image: linearHorPatology, name: 'Патологія' },
       { image: linearHorStrangeNorm, name: 'Не визначено' },
-    ]
+    ],
   },
   reinforced_linear: {
     vert: [
@@ -52,6 +52,6 @@ export const TYPICAL_IMAGES = {
       { image: reinforcedHorNorm, name: 'Норма' },
       { image: reinforcedHorPatology, name: 'Патологія' },
       { image: reinforecedHorStrangeNorm, name: 'Не визначено' },
-    ]
-  }
+    ],
+  },
 };

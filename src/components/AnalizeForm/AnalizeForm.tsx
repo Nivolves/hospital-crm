@@ -52,7 +52,7 @@ const AnalizeForm: React.FC<IAnalizeFormProps> = ({
   setTypeResult,
   type,
   representationType,
-  setRepresentationType
+  setRepresentationType,
 }): JSX.Element => {
   const [isLoading, setLoading] = useState<boolean>(false);
 
@@ -129,18 +129,12 @@ const AnalizeForm: React.FC<IAnalizeFormProps> = ({
         <>
           {!chartData?.length && (
             <Form {...formItemLayout} onSubmit={handleSubmit}>
-              <Form.Item
-                label="Тип"
-              >
-                <Select
-                  onChange={value => setRepresentationType(value)}
-                  id="sensorType"
-                  value={representationType}
-                >
+              <Form.Item label="Тип">
+                <Select onChange={value => setRepresentationType(value)} id="sensorType" value={representationType}>
                   {REPRESENTATION_TYPES.map(({ name, type }) => (
                     <Option key={type} value={type}>
                       {name}
-                      </Option>
+                    </Option>
                   ))}
                 </Select>
               </Form.Item>
