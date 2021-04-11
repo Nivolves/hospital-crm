@@ -1,17 +1,18 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import ReactCrop, { Crop } from 'react-image-crop';
 
 import AnalizeForm from '../AnalizeForm/AnalizeForm';
 import SaveModal from '../SaveModal/SaveModal';
 
-import { Button, Icon, message, Upload } from 'antd';
+import { Button, Icon, message, Upload, Select } from 'antd';
 
 import { IImageCropProps } from './Types';
 import { IImage } from '../../Types/Common';
 import { UploadFile } from 'antd/lib/upload/interface';
 
 import 'react-image-crop/dist/ReactCrop.css';
-// import './ImageCrop.scss';
+
+const { Option } = Select;
 
 const ImageCrop: React.FC<IImageCropProps> = ({
   data,
@@ -22,6 +23,8 @@ const ImageCrop: React.FC<IImageCropProps> = ({
   setSrc,
   setType,
   setTypeResult,
+  setRepresentationType,
+  representationType,
   src,
   type,
 }): JSX.Element => {
@@ -31,6 +34,12 @@ const ImageCrop: React.FC<IImageCropProps> = ({
   const [isModalOpen, openModal] = useState<boolean>(false);
   const [isCropModalOpen, openCropModal] = useState<boolean>(false);
   const [fileList, setFileList] = useState<UploadFile[]>([]);
+
+  useEffect(() => {
+    if (src) {
+      setData(undefined);
+    }
+  }, [src]);
 
   const getCroppedImg = (image, crop) => {
     if (!image) {
@@ -138,6 +147,8 @@ const ImageCrop: React.FC<IImageCropProps> = ({
               onChange={newCrop => setCrop(newCrop)}
             />
             <AnalizeForm
+              setRepresentationType={setRepresentationType}
+              representationType={representationType}
               data={data}
               image={selectedImage as IImage}
               setData={setData}

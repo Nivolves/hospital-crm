@@ -23,14 +23,15 @@ const Patient: React.FC<RouteComponentProps<url>> = ({
   const [src, setSrc] = useState<string | ArrayBuffer | null>('');
   const [type, setType] = useState<string>('');
   const [typeResult, setTypeResult] = useState<{ [key: string]: string }>();
-
-  console.log(type);
+  const [representationType, setRepresentationType] = useState<string>('vert');
 
   return (
     <>
       <PatientForm id={path} />
       <Analizes id={path} />
       <ImageCrop
+        setRepresentationType={setRepresentationType}
+        representationType={representationType}
         data={data}
         id={path}
         selectedImage={selectedImage}
@@ -47,9 +48,9 @@ const Patient: React.FC<RouteComponentProps<url>> = ({
           <div>
             <AnalizeChart data={data} typeResult={typeResult} />
             <div style={{ display: 'flex' }}>
-              {TYPICAL_IMAGES[type].map(({ image, name }) => (
+              {TYPICAL_IMAGES[type][representationType].map(({ image, name }) => (
                 <div style={{ margin: 10 }}>
-                  <img src={image} alt={name} style={{ display: 'block' }} />
+                  <img src={image} alt={name} style={{ display: 'block', width: 220 }} />
                   <p>{name}</p>
                 </div>
               ))}
