@@ -1,261 +1,336 @@
+# Copyright © 2020-2021. All rights reserved.
+# Authors: Vitalii Babenko, Vladyslav Kruhlyi, Maksym Honcharuk, Alina Ivanchenko, Oleksandr Trofimenko, Dmitro Hrishko
+# Contacts: vbabenko2191@gmail.com
+
 import numpy as np
 import pandas as pd
-import math
-import cv2
-from scipy.stats import skew
+from scipy.stats import skew, entropy
 from scipy.stats import kurtosis as kurt
-from PIL import Image
+from scipy.stats import median_abs_deviation as mad
+import statsmodels.api as sm
+import re
+from typing import Optional
+from math import ceil
+
+"""
+============================
+GLCM features (Vlad Kruhlyi)
+============================
+"""
 
 
-def normal_equations_2d(y, x):
-    xtx = [[0, 0], [0, 0]]
-    for i in range(len(x)):
-        xtx[0][1] += x[i]
-        xtx[0][0] += x[i] * x[i]
-    xtx[1][0] = xtx[0][1]
-    xtx[1][1] = len(x)
-    xtxInv = [[0, 0], [0, 0]]
-    d = 1 / (xtx[0][0] * xtx[1][1] - xtx[1][0] * xtx[0][1])
-    xtxInv[0][0] = xtx[1][1] * d
-    xtxInv[0][1] = -xtx[0][1] * d
-    xtxInv[1][0] = -xtx[1][0] * d
-    xtxInv[1][1] = xtx[0][0] * d
-    xtxInvxt = [[0 for _ in range(len(x))], [0 for _ in range(len(x))]]
-    for i in range(2):
-        for j in range(len(x)):
-            xtxInvxt[i][j] = xtxInv[i][0] * x[j] + xtxInv[i][1]
-    theta = [0, 0]
-    for i in range(2):
-        for j in range(len(x)):
-            theta[i] += xtxInvxt[i][j] * y[j]
-    return theta
-
-
-def bow_counting_dimension(image, startSize, finishSize, step=1):
-    image_f = Image.open(image)
-    image = Image.new("RGB", image_f.size)
-    image.paste(image_f)
-    baList = dict()
-    bw = image.load()
-    for b in range(startSize, finishSize + 1, step):
-        hCount = int(image.size[1] / b)
-        wCount = int(image.size[0] / b)
-        filledBoxes = [[False for _ in range(hCount + (1 if (image.size[1] > hCount * b) else 0))] for _ in
-                       range(wCount + (1 if (image.size[0] > wCount * b) else 0))]
-        for x in range(image.size[0]):
-            for y in range(image.size[1]):
-                if bw[x, y] != (255, 255, 255):
-                    xBox = x / b
-                    yBox = y / b
-                    filledBoxes[int(xBox)][int(yBox)] = True
-        a = 0
-        for i in range(len(filledBoxes)):
-            for j in range(len(filledBoxes[0])):
-                if filledBoxes[i][j]:
-                    a += 1
-        baList.update({math.log(1 / b): math.log(a)})
-    return baList
-
-
-def mink_val(img):
-    start_size = 1
-    finish_size = 400
-    step = 1
-    baList = bow_counting_dimension(img, start_size, finish_size, step)
-    lb = len(baList)
-    y = [0 for _ in range(lb)]
-    x = [0 for _ in range(lb)]
-    c = 0
-    for key in baList.keys():
-        y[c] = baList[key]
-        x[c] = key
-        c += 1
-    theta = normal_equations_2d(y, x)
-    val = theta
-    return val[0]
-
-
-def get_greyscale_matrix(filename):
-    matrix = cv2.imread(filename, 0)
-    return matrix.astype(int)
-
-
-# Difference matrix
-def get_diff_matrix(orig_matrix, var):
-    diff_matrix = []
-    # horizontal differentiation
-    if var == 'hor':
-        for i in range(orig_matrix.shape[0]):
-            row = []
-            for j in range(orig_matrix.shape[1] - 1):
-                row.append(orig_matrix[i][j + 1] - orig_matrix[i][j])
-            diff_matrix.append(row)
-    # vertical differentiation
-    else:
-        for i in range(orig_matrix.shape[0] - 1):
-            row = []
-            for j in range(orig_matrix.shape[1]):
-                row.append(orig_matrix[i + 1][j] - orig_matrix[i][j])
-            diff_matrix.append(row)
-
-    diff_matrix = np.asarray(diff_matrix)
-    diff_matrix += abs(np.amin(diff_matrix))
-    return diff_matrix
-
-
-# Grey Level Co-Occurrence Matrix
-def get_glcm(matrix):
-    a1 = matrix[:-1]
-    a2 = matrix[1:]
-    str_list = []
-    for i in range(a1.size):
-        str_list.append(str(a1[i]) + str(a2[i]))
-    a3 = []
-    for i in range(len(str_list)):
-        a3.append(str_list.count(str_list[i]))
-    glcm = pd.DataFrame({'x': a1, 'y': a2, 'z': a3})
-    glcm = glcm.drop_duplicates()
-    return glcm.sort_values(['x', 'y'])
-
-
-# Get GLCM features
-def get_x1x2x3(glcm, image_features, best_grad1, best_grad2):
-    a1 = glcm['x'].tolist()
-    a2 = glcm['y'].tolist()
-    a3 = glcm['z'].tolist()
-    max_index = a3.index(np.amax(a3))
-    result = a1[max_index] * a2[max_index]
-    image_features.append(result)  # x1
-    norm_value = pd.Series(a3)
-    norm_value = (norm_value / sum(norm_value) * 10000).tolist()
-    tp = np.array(a1)
-    arr_index = np.where(tp == best_grad1)[0]
-    result_array = []
-    for j in arr_index:
-        result_array.append(norm_value[j])
-    try:
-        result = sum(result_array) / len(result_array)
-    except:
-        result = 0
-    image_features.append(result)  # x2
-    arr_index = np.where(tp == best_grad2)[0]
-    result_array = []
-    for j in arr_index:
-        result_array.append(norm_value[j])
-    try:
-        result = sum(result_array) / len(result_array)
-    except:
-        result = 0
-    image_features.append(result)  # balx2
-    result = np.amax(a1) * np.amax(a2)
-    image_features.append(result)  # x3
+def get_glcm_features(image_features, glcm_type, image_type, glcm, best_grad, best_d, best_p):
+    max_index = np.argmax(glcm['z'].values)
+    image_features[glcm_type + 'glcm_f1_' + image_type] = glcm.at[max_index, 'x'] * glcm.at[max_index, 'y']
+    image_features[glcm_type + 'glcm_f2_' + image_type] = get_grad_freq(glcm.copy(), best_grad)
+    image_features[glcm_type + 'glcm_f3_' + image_type] = np.amax(glcm['x'].values) * np.amax(glcm['y'].values)
+    image_features[glcm_type + 'glcm_f4_' + image_type] = get_d_freq(glcm.copy(), best_d)
+    image_features[glcm_type + 'glcm_f5_' + image_type] = get_p_freq(glcm.copy(), best_p)
     return image_features
 
 
-# Grey Level Run Length Matrix
-def get_glrlm(diff_matrix):
-    glrlm = np.asarray(np.zeros((np.amax(diff_matrix) + 1, 3)), int)
-    for i in range(3):
-        d = i % 3
-        for j in range(diff_matrix.size - d):
-            if i == 0:
-                glrlm[diff_matrix[j]][i] += 1
-            elif i == 1:
-                if diff_matrix[j] == diff_matrix[j + 1]:
-                    glrlm[diff_matrix[j]][i] += 1
-            else:
-                if diff_matrix[j] == diff_matrix[j + 1] == diff_matrix[j + 2]:
-                    glrlm[diff_matrix[j]][i] += 1
-    return pd.DataFrame(glrlm)
-
-
-def get_max_features(row, best_pairs, glcm):
-    for best_pair in best_pairs:
-        pair = glcm[(glcm['x'] == best_pair[0]) & (glcm['y'] == best_pair[1])]
-        row.append((np.sum(pair['z'].values) / np.sum(glcm['z'])) * 10000)
-    return row
-
-
-def get_norm_features(init_matrix, image_features, diff_type, best_grad1, best_grad2, best_pairs, flag=False):
-    temp_diff_matrix = get_diff_matrix(init_matrix, diff_type)
-    diff_matrix = np.concatenate(temp_diff_matrix, axis=None)
-    image_features.append((np.sum(diff_matrix == np.amin(diff_matrix)) / diff_matrix.size) * 100)
-    image_features.append((np.sum(diff_matrix == np.amax(diff_matrix)) / diff_matrix.size) * 100)
-
-    # glcm
-    glcm = get_glcm(diff_matrix)
-    image_features = get_x1x2x3(glcm, image_features, best_grad1, best_grad2)
-
-    # statistical features
-    image_features.append(np.mean(diff_matrix))
-    image_features.append(np.std(diff_matrix))
-    image_features.append(skew(diff_matrix))
-    image_features.append(kurt(diff_matrix))
-    image_features.append(np.amax(diff_matrix) - np.amin(diff_matrix))  # range
-    image_features.append(np.median(diff_matrix))
-    Q1 = np.percentile(diff_matrix, 25, interpolation='midpoint')
-    Q3 = np.percentile(diff_matrix, 75, interpolation='midpoint')
-    image_features.append(Q1)
-    image_features.append(Q3)
-    image_features.append(np.percentile(diff_matrix, 5, interpolation='midpoint'))
-    image_features.append(np.percentile(diff_matrix, 95, interpolation='midpoint'))
-    IQR = Q3 - Q1
-    image_features.append(IQR)
-
-    # glrlm
-    glrlm = get_glrlm(diff_matrix)
-    # length = 1
-    image_features.append(np.mean(glrlm[0]))
-    image_features.append(np.std(glrlm[0]))
-    image_features.append(skew(glrlm[0]))
-    image_features.append(kurt(glrlm[0]))
-    image_features.append(np.amax(glrlm[0]) - np.amin(glrlm[0]))  # range
-    image_features.append(np.median(glrlm[0]))
-    Q1 = np.percentile(glrlm[0], 25, interpolation='midpoint')
-    Q3 = np.percentile(glrlm[0], 75, interpolation='midpoint')
-    image_features.append(Q1)
-    image_features.append(Q3)
-    image_features.append(np.percentile(glrlm[0], 5, interpolation='midpoint'))
-    image_features.append(np.percentile(glrlm[0], 95, interpolation='midpoint'))
-    IQR = Q3 - Q1
-    image_features.append(IQR)
-
-    # length = 2
-    image_features.append(np.mean(glrlm[1]))
-    image_features.append(np.std(glrlm[1]))
-    image_features.append(skew(glrlm[1]))
-    image_features.append(kurt(glrlm[1]))
-    image_features.append(np.amax(glrlm[1]) - np.amin(glrlm[1]))  # range
-    image_features.append(np.median(glrlm[1]))
-    Q1 = np.percentile(glrlm[1], 25, interpolation='midpoint')
-    Q3 = np.percentile(glrlm[1], 75, interpolation='midpoint')
-    image_features.append(Q1)
-    image_features.append(Q3)
-    image_features.append(np.percentile(glrlm[1], 95, interpolation='midpoint'))
-    IQR = Q3 - Q1
-    image_features.append(IQR)
-
-    # length = 3
-    image_features.append(np.mean(glrlm[2]))
-    image_features.append(np.std(glrlm[2]))
-    image_features.append(skew(glrlm[2]))
-    image_features.append(kurt(glrlm[2]))
-    image_features.append(np.amax(glrlm[2]) - np.amin(glrlm[2]))  # range
-    image_features.append(np.median(glrlm[2]))
-    image_features.append(np.percentile(glrlm[2], 75, interpolation='midpoint'))  # Q3
-    image_features.append(np.percentile(glrlm[2], 95, interpolation='midpoint'))
-
-    # differences of mode amplitudes
-    glrlm = glrlm.div(diff_matrix.size)
-    glrlm = glrlm.multiply(100)
-    image_features.append(np.amax(glrlm[0]) - np.amax(glrlm[1]))  # dif12
-    image_features.append(np.amax(glrlm[0]) - np.amax(glrlm[2]))  # dif13
-    image_features.append(np.amax(glrlm[1]) - np.amax(glrlm[2]))  # dif23
-
-    # Max Goncharuk features
-    image_features = get_max_features(image_features, best_pairs, glcm)
-
-    if flag:
-        return image_features, temp_diff_matrix
+## Calculate frequency of pair with given grad
+def get_grad_freq(glcm, grad):
+    if np.sum(glcm['z']) > 0:
+        glcm['z'] = (glcm['z'] / np.sum(glcm['z'])) * 10000
+        grad_from_glcm = glcm[(glcm['x'] == grad)]['z'].tolist()
+        if len(grad_from_glcm) > 0:
+            return np.mean(grad_from_glcm)
+        else:
+            return 0
     else:
-        return image_features
+        return 0
+
+
+## Calculate frequency of pair with given diagonal grad
+def get_d_freq(glcm, d):
+    if np.sum(glcm['z'].values) > 0:
+        glcm_d = glcm[(glcm['x'] == d) & (glcm['y'] == d)]
+        return (np.sum(glcm_d['z'].values) / np.sum(glcm['z'].values)) * 10000
+    else:
+        return 0
+
+
+## Calculate frequency of pair with given diagonal grad
+def get_p_freq(glcm, p):
+    if np.sum(glcm['z'].values) > 0:
+        glcm_p = glcm[(glcm['x'] == p[0]) & (glcm['y'] == p[1])]
+        return (np.sum(glcm_p['z'].values) / np.sum(glcm['z'].values)) * 10000
+    else:
+        return 0
+
+
+"""
+================================================
+Optimal ensembles of pixel pairs (Max Honcharuk)
+================================================
+"""
+
+
+def get_pair_ensembles(image_features, glcm_type, image_type, glcm, best_pairs):
+    glcm = pd.DataFrame(glcm, columns=['x', 'y', 'z'])
+    for best_pair in best_pairs:
+        pair = glcm[((glcm['x'] == best_pair[0]) & (glcm['y'] == best_pair[1])) |
+                    ((glcm['x'] == best_pair[1]) & (glcm['y'] == best_pair[0]))]
+        feature_name = glcm_type + 'glcm_pair' + str(best_pair[0]) + str(best_pair[1]) + '_' + image_type
+        if np.sum(glcm['z'].values) > 0:
+            image_features[feature_name] = (np.sum(pair['z'].values) / np.sum(glcm['z'].values)) * 10000
+        else:
+            image_features[feature_name] = 0
+    return image_features
+
+
+"""
+====================================
+Features from Vitya Babenko
+====================================
+"""
+
+
+# GM grads of extremes frequency
+def get_ex_grads(image_features, image_type, gm):
+    image_features['gm_minfreq_' + image_type] = (np.sum(gm == np.amin(gm)) / gm.size) * 100
+    image_features['gm_maxfreq_' + image_type] = (np.sum(gm == np.amax(gm)) / gm.size) * 100
+    return image_features
+
+
+# Greyscale distribution characteristics
+def get_dis_features(image_features, matrix_type, image_type, matrix):
+    mean = np.mean(matrix)
+    image_features[matrix_type + '_mean_' + image_type] = mean
+    std = np.std(matrix)  # Standard Deviation
+    image_features[matrix_type + '_std_' + image_type] = std
+
+    # Coefficient of Variation
+    if mean > 0:
+        image_features[matrix_type + '_cov_' + image_type] = std / mean
+    else:
+        image_features[matrix_type + '_cov_' + image_type] = 0
+
+    image_features[matrix_type + '_skew_' + image_type] = skew(matrix)  # Skewness
+    image_features[matrix_type + '_kurt_' + image_type] = kurt(matrix)  # Kurtosis
+    image_features[matrix_type + '_range_' + image_type] = np.amax(matrix) - np.amin(matrix)
+    image_features[matrix_type + '_median_' + image_type] = np.median(matrix)
+    q1 = np.percentile(matrix, 25, interpolation='midpoint')
+    image_features[matrix_type + '_q1_' + image_type] = q1
+    q3 = np.percentile(matrix, 75, interpolation='midpoint')
+    image_features[matrix_type + '_q3_' + image_type] = q3
+    image_features[matrix_type + '_p5_' + image_type] = np.percentile(matrix, 5, interpolation='midpoint')
+    image_features[matrix_type + '_p95_' + image_type] = np.percentile(matrix, 95, interpolation='midpoint')
+    image_features[matrix_type + '_iqr_' + image_type] = q3 - q1  # Intra-Quartile Range
+    image_features[matrix_type + '_mad_' + image_type] = mad(matrix)  # Mean Absolute Deviation
+    image_features[matrix_type + '_entropy_' + image_type] = entropy(matrix)
+    image_features[matrix_type + '_energy_' + image_type] = np.mean(matrix ** 2)
+    return image_features
+
+
+# Differences between amplitudes of modes
+def get_diffs(image_features, glrlm_type, image_type, glrlm):
+    image_features[glrlm_type + 'glrlm_diff12_' + image_type] = np.amax(glrlm[0]) - np.amax(glrlm[1])
+    image_features[glrlm_type + 'glrlm_diff13_' + image_type] = np.amax(glrlm[0]) - np.amax(glrlm[2])
+    image_features[glrlm_type + 'glrlm_diff23_' + image_type] = np.amax(glrlm[1]) - np.amax(glrlm[2])
+    return image_features
+
+
+# White percentage after binarization
+def get_wp(image_features, gm, diff_indices, image_type):
+    new_gm = np.where(np.isin(gm, diff_indices), 255, 0)
+    image_features['gm_wp_' + image_type] = np.sum(new_gm == 255) / new_gm.size
+    return image_features
+
+
+"""
+====================================
+LBP operator features (Alina Ivanchenko)
+====================================
+"""
+
+
+def get_lbp_features(image_features, gm, image_type):
+    lbp_list = [0, 1, 2, 3, 4, 6, 7, 8, 12, 14, 15, 16, 24, 28, 30, 31, 32, 48, 56, 60, 62, 63, 64, 96, 112, 120, 124,
+                126, 127, 128, 129, 131, 135, 143, 159, 191, 192, 193, 195, 199, 207, 223, 224, 225, 227, 231, 239, 240,
+                241, 243, 247, 248, 249, 251, 252, 253, 254, 255]
+    lbp_img = lbp_operator(gm)
+    for lbp in lbp_list:
+        image_features['gm_lbp' + str(lbp) + '_' + image_type] = np.sum(lbp_img == lbp) / lbp_img.size
+    image_features = get_dis_features(image_features, 'gm(lbp)', image_type, lbp_img)
+    return image_features
+
+
+# Checking the location of a pixel outside the image
+def out_of_bounds(point, length):
+    return (point < 0) | (point > length)
+
+
+# Transforming image with LBP (Local Binary Patterns) operator
+def lbp_operator(gm):
+    width, height = gm.shape[0], gm.shape[1]
+    lbp_img = []
+    for x in range(width):
+        for y in range(height):
+            index = 0
+            ssum = 0
+            c_list = []
+            for i in range(-1, 2):
+                for j in range(-1, 2):
+                    if i == 0 and j == 0:
+                        continue
+                    new_i = i + x
+                    new_j = j + y
+                    if out_of_bounds(new_i, width - 1) or out_of_bounds(new_j, height - 1):
+                        s = 1
+                        c_list.append(0)
+                    else:
+                        num = gm[new_i, new_j] - gm[x, y]
+                        if num > 0:
+                            s = 0
+                        else:
+                            s = 1
+                        c_list.append(gm[new_i, new_j])
+                    ssum += s * (2 ** index)
+                    index += 1
+            lbp_img.append(ssum)
+    return np.asarray(lbp_img, int)
+
+
+"""
+====================================
+Set classification features (Dima Hrishko and Sasha Trofimenko)
+====================================
+"""
+
+
+def create_dataset(afc_values, structure):
+    Y, X = afc_values[:, 0], []
+    try:
+        for component in structure.split("+"):
+            if component == "a":
+                X.append(np.ones_like(Y))
+
+            elif component.isdigit():
+                X.append(afc_values[:, int(component) - 1])
+
+            elif "^" in component:
+                idx = re.search(r"\(([A-Za-z0-9_]+)\)", component).group(1)
+                power = component.split("^")[-1]
+                x = afc_values[:, int(idx) - 1] ** int(power)
+                X.append(x)
+
+            elif "x" in component:  # TODO: update to multiply 2+ arrays
+                idxs = np.array(component.split("x")).astype(int)
+                x_multiply = afc_values[:, idxs[0] - 1] * afc_values[:, idxs[1] - 1]
+                X.append(x_multiply)
+
+        return np.stack(X, axis=0), Y
+    except:
+        return 0, 0
+
+
+def direct_calculation(X, Y):
+    """
+    Прямой подсчет МНК
+    X - Матрица объект/свойство
+    Y - Вектор выхода
+    return a - Вектор параметров
+    """
+    HS = X.T.dot(X)
+    a = np.linalg.inv(HS).dot(X.T).dot(Y)
+    return a
+
+
+"""
+====================================
+Spatitial scan (Sasha Trofimenko)
+====================================
+"""
+
+
+def calc_acf_for_img(box, n):
+    """
+    Apply autocorrelation function to bounding box
+    Parameters
+    ----------
+    box : 2d numpy array with bounding box image
+    n : number of indices for peaks
+    Returns
+    -------
+    indices : 2d numpy array with H_image x N size with indices from acf
+    values : 2d numpy array with H_image x N size with values from acf
+    Examples
+    --------
+    # >>> indices, values = calc_acf_for_img(img_array, n=5)
+    # >>> indices.shape, values.shape
+    (113, 5) (113, 5)
+    """
+    indices = []
+    values = []
+    for row in box:
+        acf = sm.tsa.stattools.acf(row, fft=False)
+        idx = (-acf).argsort()[:n]
+        indices.append(idx)
+        values.append(row[idx])
+    return np.array(indices), np.array(values)
+
+
+def get_spatial_scan_coeffs(image_features, gm, model_structure, index1, image_type, N=5):
+    _, values = calc_acf_for_img(gm, N)
+    X, Y = create_dataset(values, model_structure)
+    try:
+        model_params = direct_calculation(X.T, Y)
+        index2 = 1
+        for param in model_params:
+            image_features['gm_sscoeff' + str(index1) + str(index2) + '_' + image_type] = param
+            index2 += 1
+    except:
+        index2 = 1
+        for component in model_structure.split("+"):
+            image_features['gm_sscoeff' + str(index1) + str(index2) + '_' + image_type] = 0
+            index2 += 1
+    return image_features
+
+
+"""
+====================================
+Sliding window (Dima Hrishko)
+====================================
+"""
+
+
+def get_kernels(gm, h, w, kernel_size, cell_mode=0) -> Optional[np.ndarray]:
+    target_index = 0 if cell_mode == 'first' else ceil(kernel_size ** 2 / 2)  # NOTE: tmp solution is left
+    target_index = cell_mode  # should be int
+    # print('target index = ', target_index)
+    values = []
+    for i in range(0, h - kernel_size + 1, kernel_size):
+        for j in range(0, w - kernel_size + 1, kernel_size):
+            values.append(gm[i:i + kernel_size, j:j + kernel_size].reshape(-1))
+
+    values = np.array(values)
+    # print(values.shape, gm.shape)
+    target = values[:, target_index]
+    values = np.delete(values, target_index, 1)
+    return np.hstack((np.expand_dims(target, axis=1), values))
+
+
+def get_sliding_window_coeffs(image_features, gm, model_structure, index1, image_type, kernel_size=3):
+    h, w = gm.shape
+    if kernel_size > h or kernel_size > w:
+        index2 = 1
+        for component in model_structure.split("+"):
+            image_features['gm_swcoeff' + str(index1) + str(index2) + '_' + image_type] = 0
+            index2 += 1
+    else:
+        values = get_kernels(gm, h, w, kernel_size)
+        X, Y = create_dataset(values, model_structure)
+        try:
+            model_params = direct_calculation(X.T, Y)
+            index2 = 1
+            for param in model_params:
+                image_features['gm_swcoeff' + str(index1) + str(index2) + '_' + image_type] = param
+                index2 += 1
+        except:
+            index2 = 1
+            for component in model_structure.split("+"):
+                image_features['gm_swcoeff' + str(index1) + str(index2) + '_' + image_type] = 0
+                index2 += 1
+    return image_features
